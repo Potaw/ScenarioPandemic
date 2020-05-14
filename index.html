@@ -21,6 +21,7 @@
 			var rolesShuffle;
 			var paquetEpidemie;
 			var paquetEpidemiesEntier = [];
+			var nbTours = 0;
 			
 			
 			/** Retourne un nombre aléatoire entre min et max */
@@ -55,10 +56,10 @@
 					return 'gray';
 				}
 				else if (rouge.indexOf(carte) >= 0) {
-					return 'orange';
+					return 'red';
 				}
 				else if (epidemies.indexOf(carte) >= 0) {
-					return 'red';
+					return 'springgreen';
 				}
 				return 'white';
 			}
@@ -80,7 +81,16 @@
 			
 			/** Fonction principale */
 			function run () {
+				// Grisage du bouton "Tirer 1ère carte" + "GO..."
+				document.getElementById('idButtonCarte1').disabled = true;
+				document.getElementById('idNouveauTour').disabled = true;
+				
 				document.getElementById('idPartie').style.display = "block";
+				
+				document.getElementById('idCartesEpidemie').style.display = "none";
+				document.getElementById('idButtonCarte2').style.display = "none";
+				document.getElementById('idCartesJoueurs').style.display = "block";
+				
 				// Tableau temporaire d'évènements
 				var evenementsHasard = evenements;
 				
@@ -116,9 +126,9 @@
 				// On écrit toutes les cartes dans l'ordre dans un lien SPOIL, au cas où
 				document.getElementById('idToutPaquet').innerHTML = "SPOIL<br/>3<br/>2<br/>1<br/>0<br/>" + paquetJoueur.join ("<br />");
 				//console.log(paquetJoueur.join("\n"));
-				paquetJoueur.forEach(function(item, index, array) {
+				/*paquetJoueur.forEach(function(item, index, array) {
 					console.log(index, item);
-				});
+				});*/
 				
 				// Préparation paquet épdémie
 				paquetEpidemie = bleu.concat(jaune).concat(noir).concat(rouge);
@@ -129,6 +139,11 @@
 				prepatationPaquetPropagations();
 				
 				document.getElementById('idPaquetEpidemiesEntier').innerHTML = paquetEpidemiesEntier.join ("<br />");
+				
+				var chaine = paquetJoueur.join('*');
+				console.log(chaine.split('*'));
+				console.log(paquetJoueur);
+
 				
 				//console.log(paquetJoueur.join());
 				/*paquetJoueur.forEach(function(item, index, array) {
@@ -142,12 +157,19 @@
 				// On affiche les idCarte au cas où elles étaients masquées
 				document.getElementById('idCarte1').style.display = "block";
 				document.getElementById('idCarte2').style.display = "block";
+				
 				var isIdCarte1 = idCarte == 'idCarte1';
 				if (isIdCarte1) {
 					document.getElementById('idCarte2').innerHTML = "...";
+					document.getElementById('idButtonCarte1').style.display = "none";
+					document.getElementById('idButtonCarte2').style.display = "block";
 				}
-				document.getElementById('idButtonCarte1').style.display = isIdCarte1 ? "none" : "block";
-				document.getElementById('idButtonCarte2').style.display = isIdCarte1 ? "block" : "none";
+				else {
+					document.getElementById('idButtonCarte1').style.display = "block";
+					document.getElementById('idButtonCarte1').disabled = true;
+					document.getElementById('idButtonCarte2').style.display = "none";
+					document.getElementById('idTourneMaladie').disabled = false;
+				}
 				
 				// S'il n'y a plus de carte dans le paquet, alors la partie est perdue
 				if(paquetJoueur.length == 0) {
@@ -158,7 +180,7 @@
 				// On prend la prochaine carte du paquet
 				var carte = paquetJoueur.shift();
 				document.getElementById(idCarte).innerHTML = "<font color='" + getCouleur(carte) + "'>" + carte + "</font>";
-				
+				document.getElementById('idRecap').innerHTML += carte + "<br />";
 			}
 			
 			/** Permet de cacher ou de montrer les cartes des joueurs */
@@ -184,43 +206,20 @@
 			}
 			
 			/** Affiche ou masque les 2 cartes de propagation */
+			/** @deprecated **/
 			function masquerAfficher2cartes(){
 				var noneBlock = document.getElementById('idCarte1').style.display == "block" ? "none" : "block";
 				document.getElementById('idCarte1').style.display = noneBlock;
 				document.getElementById('idCarte2').style.display = noneBlock;
 			}
 			
-			/** Permet de lancer une partie avec une confirmation */
-			function confirmationRun() {
-				if(confirm("Lancer une nouvelle partie ?")) {
-					init();
-					run();
-				}
-				else {
-					alert("Pas de nouvelle partie de lancée.");
-				}
-			}
 			
-			/** Au chargement, on initialise la page */
-			function init() {
-				var idAinit= ['idJoueur1', 'idJoueur2', 'idCarte1', 'idCarte2', 'idToutPaquet'];
-				document.getElementById('idPartie').style.display = "none";
-				document.getElementById('idButtonCarte2').style.display = "none";
-				document.getElementById('idCartesJoueurs').style.display = "block";
-				document.getElementById('idCartesEpidemie').style.display = "none";
-				document.getElementById('idCarte1').style.visibility = "visible";
-				idAinit.forEach(function(item, index, array) {
-					document.getElementById(item).innerHTML = " ";
-				});
-				
-				// Supprimons l'éventuel dernier slash de l'URL
-				/*var urlcourante = document.location.href.replace(/\/$/, "");
-				
-				// Gardons dans la variable queue_url uniquement la portion derrière le dernier slash de urlcourante
-				var queue_url = urlcourante.substring (urlcourante.lastIndexOf( "/" )+1 );
-				alert (' Queue URL : \n' + queue_url);*/
-			}
+			// Supprimons l'éventuel dernier slash de l'URL
+			/*var urlcourante = document.location.href.replace(/\/$/, "");
 			
+			// Gardons dans la variable queue_url uniquement la portion derrière le dernier slash de urlcourante
+			var queue_url = urlcourante.substring (urlcourante.lastIndexOf( "/" )+1 );
+			alert (' Queue URL : \n' + queue_url);*/
 			
 			/** Retourne combien de cartes ville du paquet propatation il faut tirer */
 			function combienTirerDeCartes (nbEpidemies) {
@@ -257,121 +256,138 @@
 				for (var i = 0 ; i < paquetJoueur.length ; i++) {
 					var nbEpidemiesEn2Cartes = 0;
 					
-					// on tire 2 cartes joueurs
-					for(var m = 0 ; m <= 1 ; m++) {
-						if (epidemies.indexOf(paquetJoueur[i]) >= 0) {
-							nbEpidemiesEn2Cartes++;
-							nbEpidemies++;
-							
-							// On pioche la carte de sous le paquet
-							villeEpidemie = paquetEpidemie.pop();
-							
-							// On ajoute la carte épidémie à la défausse
-							defaussePropagation[k++] = villeEpidemie;
-							
-							// On ajoute dans le paquetEpidemiesEntier l'épidémie
-							paquetEpidemiesEntier[j++] = "Epidemie n° " + nbEpidemies + " : " + villeEpidemie;
-							
-							// On mélange la défausse
-							shuffle(defaussePropagation);
-							
-							// on la met au-dessus du paquet
-							paquetEpidemie = defaussePropagation.concat(paquetEpidemie);
-							
-							// On vide le paquet defaussePropagation
-							defaussePropagation.length = 0;
-							k = 0;
-						}
-						
-						// Si on a déjà tiré une carte, on n'incrémente pas i ici
-						i += m == 0 ? 1 : 0;
-						
-						// Si c'est la dernière carte, alors la partie est perdue
-						if (i == 51) {
-							paquetEpidemiesEntier[j++] = "Perdu...";
-							return;
-						}
+					// Combien d'épidémies dans les 2 prochaines cartes ?
+					if (epidemies.indexOf(paquetJoueur[i]) >= 0) {
+						nbEpidemiesEn2Cartes++;
+					}
+					if (epidemies.indexOf(paquetJoueur[i + 1]) >= 0) {
+						nbEpidemiesEn2Cartes++;
 					}
 					
-					// On calcule combien de cartes ville on doit tirer (on peut en tirer bp si on tombe sur 2 cartes épidémies)
-					var nbCartes = combienTirerDeCartes(nbEpidemies) + (nbEpidemiesEn2Cartes == 2 ? combienTirerDeCartes(nbEpidemies - 1) : 0);
+					// On boucle sur le nombre de cartes épidémies tournées en 2 cartes
+					for (var epi = 1 ; epi <= nbEpidemiesEn2Cartes ; epi++) {
+						nbEpidemies++;
+						// On pioche la carte de sous le paquet
+						villeEpidemie = paquetEpidemie.pop();
+						
+						// On ajoute la carte épidémie à la défausse
+						defaussePropagation[k++] = villeEpidemie;
+						
+						// On ajoute dans le paquetEpidemiesEntier l'épidémie
+						paquetEpidemiesEntier[j++] = "Epidemie n° " + nbEpidemies + " : " + villeEpidemie;
+						
+						// On mélange la défausse
+						shuffle(defaussePropagation);
+						
+						// on la met au-dessus du paquet
+						paquetEpidemie = defaussePropagation.concat(paquetEpidemie);
+						
+						// On vide le paquet defaussePropagation
+						defaussePropagation.length = 0;
+						k = 0;
+					}
+					
+					var nbCartes = combienTirerDeCartes(nbEpidemies);
 					for(var carte = 1; carte <= nbCartes ; carte++) {
 						villePropagation = paquetEpidemie.shift();
 						paquetEpidemiesEntier[j++] = carte + "/" + nbCartes + " - " + villePropagation;
 						defaussePropagation[k++] = villePropagation;
 					}
 					
+					// On tire les cartes 2 par 2
+					i++;
 				}
 			}
 			
 			function tourneMaladie(){
-				//alert(paquetEpidemiesEntier.shift());
-				document.getElementById('idCartesPropagation').innerHTML += paquetEpidemiesEntier.shift() + "<br />";
+				var carte = paquetEpidemiesEntier.shift();
+				document.getElementById('idCartesPropagation').innerHTML += carte + "<br />";
+				document.getElementById('idRecap').innerHTML += carte + "<br />";;
+				if (carte.charAt(0) == carte.charAt(2)) {
+					var joueur = (paquetJoueur.length + 1) % 4 == 0 ? 1 : 2;
+					document.getElementById('idTourneMaladie').disabled = true;
+					document.getElementById('idNouveauTour').innerHTML = "Go => " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
+					document.getElementById('idNouveauTour').disabled = false;
+				}
 			}
 			
-			function effacerCartesPropagation(){
+			//
+			function nouveauTour() {
+				document.getElementById('idButtonCarte1').disabled = false;
+				document.getElementById('idCarte1').style.display = "none";
+				document.getElementById('idCarte2').style.display = "none";
+				document.getElementById('idNouveauTour').disabled = true;
 				document.getElementById('idCartesPropagation').innerHTML = "<br/>";
+				nbTours++;
+				document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idNouveauTour').innerHTML + "</b><br />";;
 			}
+			
 			
 		</script>
 	</head>
 	
-	<body onload="init();" background="back.jpg" style="color:#FFF">
-		<div align="right">
-			<a onClick="confirmationRun()" href="#" id="idLancerPartie">Lancer une partie</a><br /><br />
-		</div>
-		
-		<div id="idPartie">
-			<a id="idCacherMontrerCartes" onclick="cacherMontrerCartes()" href="#"> Cacher les cartes</a><br/>
-			<font size="4" face="arial">
-				<div id="idCartesJoueurs">
-					<strong>Joueur 1 : <span id="idJoueur1Role"></span></strong>
-					<span id="idJoueur1"></span>
+	<body onload="run();" background="back.jpg" style="color:#FFF">
+		<font face="arial">
+			<div id="idPartie">
+				<a id="idCacherMontrerCartes" onclick="cacherMontrerCartes()" href="#"> Cacher les cartes</a><br/>
+				<font size="5">
+					<div id="idCartesJoueurs">
+						<strong>Joueur 1 : <span id="idJoueur1Role"></span></strong>
+						<span id="idJoueur1"></span>
+						
+						<strong>Joueur 2 : <span id="idJoueur2Role"></span></strong>
+						<span id="idJoueur2"></span><br/><br/>
+					</div>
+					<br/>
+				</font>
+				
+				<div id="gauche">
+					<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')">Tirer 1<sup>ère</sup> carte</button>
+					<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')">Tirer 2<sup>nde</sup> carte</button>
+					<!-- button id="idButtonCarte3" onclick="masquerAfficher2cartes()">Masquer/afficher</button -->
 					
-					<strong>Joueur 2 : <span id="idJoueur2Role"></span></strong>
-					<span id="idJoueur2"></span><br/><br/>
+					<font size="6">
+						<strong><span id="idCarte1"> </span>
+						<span id="idCarte2"> </span></strong>
+					</font>
+				</div>
+				
+				<div id="centre">
+					<button id="idTourneMaladie" onclick="tourneMaladie()">Tirer carte épidémie</button>
+					<button onclick="nouveauTour()" id="idNouveauTour">GO...</button>
+					<font size="5">
+						<strong><span id="idCartesPropagation"><br/></span></strong>
+					</font>
+				</div>
+				
+				
+				<div id="droite">
+					<p align="center">
+						<iframe title="Minuteur" width="400" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"></iframe>
+					</p>
+				</div>
+				
+				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+				
+				<div id="idRecap">
+					
+				</div>
+				
+				<a id="idCacherMontrerEpidemie" onclick="cacherMontrerEpidemie()" href="#">SPOIL</a><br/>
+				<div id="idCartesEpidemie" >
+					<span id="idToutPaquet" style="color:#000"></span>
 				</div>
 				<br/>
-			</font>
-			
-			<div id="gauche">
-				<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')">Tirer 1<sup>ère</sup> carte</button>
-				<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')">Tirer 2<sup>nde</sup> carte</button>
-				<button id="idButtonCarte3" onclick="masquerAfficher2cartes()">Masquer/afficher</button>
 				
-				<font size="6" face="arial">
-					<strong><span id="idCarte1"> </span>
-					<span id="idCarte2"> </span></strong>
-				</font>
+				<span id="idPaquetEpidemiesEntier" style="color:#000"></span>
+				
 			</div>
-			
-			<div id="centre">
-				<button onclick="tourneMaladie()" id="idTourneMaladie">Tire carte épidémie</button>
-				<button onclick="effacerCartesPropagation()" id="idTourneMaladie">Effacer carte épidémie</button>
-				<font size="5" face="arial">
-					<strong><span id="idCartesPropagation"><br/></span></strong>
-				</font>
-			</div>
-			
-			
-			<div id="droite">
-				<p align="center">
-					<iframe title="Minuteur" width="400" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"></iframe>
-				</p>
-			</div>
-			
-			
-			<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-			
-			<a id="idCacherMontrerEpidemie" onclick="cacherMontrerEpidemie()" href="#">SPOIL</a><br/>
-			<div id="idCartesEpidemie" >
-				<span id="idToutPaquet" style="color:#000"></span>
-			</div>
-			<br/>
-			
-			<span id="idPaquetEpidemiesEntier" style="color:#000"></span>
-			
-		</div>
+		</font>
 		
 	</body>
 	
