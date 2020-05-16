@@ -3,14 +3,14 @@
 	<head>
 		<title>Scénarios Pandémie</title>
 		<meta charset="utf-8">
-		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="style/style.css">
 		<script>
 			
 			/** Définition des constantes de l'ensemble des cartes */
 			const bleu = ['Atlanta', 'New York', 'Whashington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersburg'];
 			const jaune = ['Los Angeles', 'Mexico', 'Miami', 'Bogota', 'Lima', 'Santiago', 'Buenos Aires', 'Sao Paulo', 'Lagos', 'Khartoum', 'Kinshasa', 'Johannesburg'];
 			const noir = ['Alger', 'Le Caire', 'Istanbul', 'Moscou', 'Téhéran', 'Bagdad', 'Riyad', 'Karachi', 'Delhi', 'Mumbai', 'Calcutta', 'Chennai'];
-			const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho-Chi-Minh-Ville', 'Bangkok', 'Hong-Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
+			const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho Chi Minh Ville', 'Bangkok', 'Hong Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
 			const evenements = ['Pont aérien', 'Subvention publique', 'Hôpital mobile', 'Rééxaminer les recherches', 'Traitements à distance', 'Ordres spéciaux', 'Temps emprunté', 'Déploiement de vaccins rapides'];
 			const epidemies = ['Pente fatale', 'Structure moléculaire complexe', 'Pertes inacceptables', 'Effet chronique', 'Ingérence gouvernementale', 'Populations non calculées'];
 			const roles = ['Scientifique', 'Epidémiologiste', 'Opérateur de terrain', 'Spécialiste en quarantaine', 'Généraliste', 'Chercheuse', 'Archiviste', 'Spécialiste en confinement', 'Expert aux opérations', 'Planificateur d\'urgence', 'Médecin'];
@@ -18,11 +18,12 @@
 			/** Variables globales */
 			var paquetJoueur;
 			var epidemdiesShuffle;
-			var rolesShuffle;
+			var rolesShuffle = [];
 			var paquetEpidemie;
-			var paquetEpidemiesEntier = [];
+			var paquetPropagationEntier = [];
 			var nbTours = 0;
 			
+			var url = "";
 			
 			/** Retourne un nombre aléatoire entre min et max */
 			function randomInt (min, max) {
@@ -50,18 +51,18 @@
 					return 'blue';
 				}
 				else if (jaune.indexOf(carte) >= 0) {
-					return 'yellow';
+					return 'Orange';
 				}
 				else if (noir.indexOf(carte) >= 0) {
-					return 'gray';
+					return 'black';
 				}
 				else if (rouge.indexOf(carte) >= 0) {
 					return 'red';
 				}
 				else if (epidemies.indexOf(carte) >= 0) {
-					return 'springgreen';
+					return 'MediumSeaGreen';
 				}
-				return 'white';
+				return 'SlateGray';
 			}
 			
 			
@@ -81,76 +82,106 @@
 			
 			/** Fonction principale */
 			function run () {
-				// Grisage du bouton "Tirer 1ère carte" + "GO..."
-				document.getElementById('idButtonCarte1').disabled = true;
-				document.getElementById('idNouveauTour').disabled = true;
+				// S'il existe des paramètres dans la requête, on s'en sert
+				var vars = {};
+				vars['roleJoueur1'] = "";
+				vars['roleJoueur2'] = "";
+				vars['paquetJoueur'] = "";
+				vars['paquetPropagationEntier'] = "";
 				
-				document.getElementById('idPartie').style.display = "block";
+				window.location.href.replace(location.hash, '').replace( 
+					/[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+					function( m, key, value ) { // callback
+						vars[key] = value !== undefined ? value : '';
+					}
+				);
 				
-				document.getElementById('idCartesEpidemie').style.display = "none";
-				document.getElementById('idButtonCarte2').style.display = "none";
-				document.getElementById('idCartesJoueurs').style.display = "block";
+				// Si les rôles sont passés en paramètre, on les prend
+				if(vars['roleJoueur1'].length >= 1 && vars['roleJoueur2'].length >= 1) {
+					rolesShuffle[0] = decodeURI(vars['roleJoueur1']);
+					rolesShuffle[1] = decodeURI(vars['roleJoueur2']);
+				}
+				// Sinon, on mélange les rôles existants
+				else {
+					rolesShuffle = roles.slice();
+					shuffle(rolesShuffle);
+				}
 				
-				// Tableau temporaire d'évènements
-				var evenementsHasard = evenements;
+				// Si le pauetJoueur est passé en paramètre, on le prend
+				if(vars['paquetJoueur'].length >= 1) {
+					paquetJoueur = decodeURI(vars['paquetJoueur']).split('*');
+					// vérif taille paquet passé param
+					/*if (vars['paq'].length >= 1) {
+						console.log(decodeURI(vars['paq']).split('*'));
+						paquetJoueur = decodeURI(vars['paq']).split('*');
+					}*/
+				}
+				// Sinon, on le génère
+				else {
+					// Tableau temporaire d'évènements
+					var evenementsHasard = evenements;
+					
+					// Mélange du tableau d'évènements
+					shuffle(evenementsHasard);
+					
+					// Création du paquet joueur, avec que 5 évènements
+					paquetJoueur = bleu.concat(jaune).concat(noir).concat(rouge).concat(evenementsHasard.slice(3));
+					
+					// Mélange du paquet joueur
+					shuffle(paquetJoueur);
+					
+					document.getElementById('lien').href = "file:///C:/Users/admin/Documents/ScenarioPandemic/index.html?paq=" + 
+					encodeURI(paquetJoueur.join('*'));
+					
+					// Mélange le paquet des 6 épidémies
+					epidemdiesShuffle = epidemies.slice();
+					shuffle(epidemdiesShuffle);
+					
+					// Ajout des 6 épidémies en partant de la fin
+					paquetJoueur.splice(47 + randomInt(0,7), 0, epidemdiesShuffle.shift());
+					paquetJoueur.splice(39 + randomInt(0,7), 0, epidemdiesShuffle.shift());
+					paquetJoueur.splice(32 + randomInt(0,7), 0, epidemdiesShuffle.shift());
+					paquetJoueur.splice(24 + randomInt(0,8), 0, epidemdiesShuffle.shift());
+					paquetJoueur.splice(16 + randomInt(0,8), 0, epidemdiesShuffle.shift());
+					paquetJoueur.splice(8 + randomInt(0,8), 0, epidemdiesShuffle.shift());
+				}
 				
-				// Mélange du tableau d'évènements
-				shuffle(evenementsHasard);
+				// Si le paquet propagation est passé en paramètre, on le prend
+				if(vars['paquetPropagationEntier'].length >= 1) {
+					paquetPropagationEntier = decodeURI(vars['paquetPropagationEntier']).split('*');
+				}
+				// Sinon, on le génère
+				else {
+					// Préparation paquet épdémie
+					paquetEpidemie = bleu.concat(jaune).concat(noir).concat(rouge);
+					
+					// Mélange du paquet épidémie
+					shuffle(paquetEpidemie);
+					
+					// Préparation du paquet entier de Propagation
+					prepatationPaquetPropagations();
+				}
 				
-				// Création du paquet joueur, avec que 5 évènements
-				paquetJoueur = bleu.concat(jaune).concat(noir).concat(rouge).concat(evenementsHasard.slice(3));
-				
-				// Mélange du paquet joueur
-				shuffle(paquetJoueur);
-				
-				// Mélange le paquet des 6 épidémies
-				epidemdiesShuffle = epidemies.slice();
-				shuffle(epidemdiesShuffle);
-				
-				// Mélange des rôles
-				rolesShuffle = roles.slice();
-				shuffle(rolesShuffle);
+				// On génère le lien de la partie
+				document.getElementById('lien').href = "file:///C:/Users/admin/Documents/ScenarioPandemic/index.html?" +
+				"roleJoueur1=" +  encodeURI(rolesShuffle[0]) +
+				"&roleJoueur2=" +  encodeURI(rolesShuffle[1]) +
+				"&paquetJoueur=" + encodeURI(paquetJoueur.join('*')) +
+				"&paquetPropagationEntier=" + encodeURI(paquetPropagationEntier.join('*'));
 				
 				// Permet de tirer les 4 cartes pour les 2 joueurs
 				miseEnPlaceJoueur('idJoueur1');
 				miseEnPlaceJoueur('idJoueur2');
 				
-				// Ajout des 6 épidémies en partant de la fin
-				paquetJoueur.splice(38 + randomInt(0,7), 0, epidemdiesShuffle.shift());
-				paquetJoueur.splice(31 + randomInt(0,7), 0, epidemdiesShuffle.shift());
-				paquetJoueur.splice(24 + randomInt(0,7), 0, epidemdiesShuffle.shift());
-				paquetJoueur.splice(16 + randomInt(0,8), 0, epidemdiesShuffle.shift());
-				paquetJoueur.splice(8 + randomInt(0,8), 0, epidemdiesShuffle.shift());
-				paquetJoueur.splice(0 + randomInt(0,8), 0, epidemdiesShuffle.shift());
-				
-				// On écrit toutes les cartes dans l'ordre dans un lien SPOIL, au cas où
+				// On écrit toutes les cartes au cas où
 				document.getElementById('idToutPaquet').innerHTML = "SPOIL<br/>3<br/>2<br/>1<br/>0<br/>" + paquetJoueur.join ("<br />");
-				//console.log(paquetJoueur.join("\n"));
-				/*paquetJoueur.forEach(function(item, index, array) {
-					console.log(index, item);
-				});*/
-				
-				// Préparation paquet épdémie
-				paquetEpidemie = bleu.concat(jaune).concat(noir).concat(rouge);
-				
-				// Mélange du paquet épidémie
-				shuffle(paquetEpidemie);
-				
-				prepatationPaquetPropagations();
-				
-				document.getElementById('idPaquetEpidemiesEntier').innerHTML = paquetEpidemiesEntier.join ("<br />");
-				
-				var chaine = paquetJoueur.join('*');
-				console.log(chaine.split('*'));
-				console.log(paquetJoueur);
-
-				
-				//console.log(paquetJoueur.join());
-				/*paquetJoueur.forEach(function(item, index, array) {
-					console.log(index, item);
-				});*/
+				document.getElementById('idpaquetPropagationEntier').innerHTML = paquetPropagationEntier.join ("<br />");
 			}
 			
+			//console.log(paquetJoueur.join("\n"));
+			/*paquetJoueur.forEach(function(item, index, array) {
+				console.log(index, item);
+			});*/
 			
 			/** Affiche et supprime la 1ère carte du paquet joueur */
 			function tirerCartes(idCarte) {
@@ -168,7 +199,7 @@
 					document.getElementById('idButtonCarte1').style.display = "block";
 					document.getElementById('idButtonCarte1').disabled = true;
 					document.getElementById('idButtonCarte2').style.display = "none";
-					document.getElementById('idTourneMaladie').disabled = false;
+					document.getElementById('idTournePropagation').disabled = false;
 				}
 				
 				// S'il n'y a plus de carte dans le paquet, alors la partie est perdue
@@ -239,7 +270,7 @@
 				var nbEpidemies = 0;
 				var villePropagation = [];
 				
-				// Compteur du paquet paquetEpidemiesEntier
+				// Compteur du paquet paquetPropagationEntier
 				var j = 0;
 				
 				// Compteur du paquet defaussePropagation
@@ -248,12 +279,12 @@
 				// On tire les 9 premières cartes des maladies
 				for (var i = 1 ; i <= 9 ; i++) {
 					villePropagation = paquetEpidemie.shift();
-					paquetEpidemiesEntier[j++] = i + "/9 - " + villePropagation;
+					paquetPropagationEntier[j++] = i + "/9 - " + villePropagation;
 					defaussePropagation[k++] = villePropagation;
 				}
 				
 				// On parcourt chaque carte du paquet joueur
-				for (var i = 0 ; i < paquetJoueur.length ; i++) {
+				for (var i = 8 ; i < paquetJoueur.length ; i++) {
 					var nbEpidemiesEn2Cartes = 0;
 					
 					// Combien d'épidémies dans les 2 prochaines cartes ?
@@ -273,8 +304,8 @@
 						// On ajoute la carte épidémie à la défausse
 						defaussePropagation[k++] = villeEpidemie;
 						
-						// On ajoute dans le paquetEpidemiesEntier l'épidémie
-						paquetEpidemiesEntier[j++] = "Epidemie n° " + nbEpidemies + " : " + villeEpidemie;
+						// On ajoute dans le paquetPropagationEntier l'épidémie
+						paquetPropagationEntier[j++] = "Epidemie n° " + nbEpidemies + " - " + villeEpidemie;
 						
 						// On mélange la défausse
 						shuffle(defaussePropagation);
@@ -290,7 +321,7 @@
 					var nbCartes = combienTirerDeCartes(nbEpidemies);
 					for(var carte = 1; carte <= nbCartes ; carte++) {
 						villePropagation = paquetEpidemie.shift();
-						paquetEpidemiesEntier[j++] = carte + "/" + nbCartes + " - " + villePropagation;
+						paquetPropagationEntier[j++] = carte + "/" + nbCartes + " - " + villePropagation;
 						defaussePropagation[k++] = villePropagation;
 					}
 					
@@ -299,13 +330,22 @@
 				}
 			}
 			
-			function tourneMaladie(){
-				var carte = paquetEpidemiesEntier.shift();
-				document.getElementById('idCartesPropagation').innerHTML += carte + "<br />";
-				document.getElementById('idRecap').innerHTML += carte + "<br />";;
+			// Permet de tourner les cartes du paquet propagation
+			function tournePropogation(){
+				document.getElementById('idCarteJoueurs').className = 'pasEnCours';
+				document.getElementById('idDivCartesPropagation').className = 'enCours';
+				var carte = paquetPropagationEntier.shift();
+				
+				var ville = carte.split('-');
+				
+				document.getElementById('idCartesPropagation').innerHTML += ville[0] + "<font color='" + getCouleur(ville[1].substr(1)) + "'>" + ville[1] + "</font><br />";
+				document.getElementById('idRecap').innerHTML += carte + "<br />";
+				
+				
+				
 				if (carte.charAt(0) == carte.charAt(2)) {
 					var joueur = (paquetJoueur.length + 1) % 4 == 0 ? 1 : 2;
-					document.getElementById('idTourneMaladie').disabled = true;
+					document.getElementById('idTournePropagation').disabled = true;
 					document.getElementById('idNouveauTour').innerHTML = "Go => " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
 					document.getElementById('idNouveauTour').disabled = false;
 				}
@@ -319,76 +359,77 @@
 				document.getElementById('idNouveauTour').disabled = true;
 				document.getElementById('idCartesPropagation').innerHTML = "<br/>";
 				nbTours++;
-				document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idNouveauTour').innerHTML + "</b><br />";;
+				document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idNouveauTour').innerHTML + "</b><br />";
+				document.getElementById('idCarteJoueurs').className = 'enCours';
+				document.getElementById('idDivCartesPropagation').className = 'pasEnCours';
 			}
 			
 			
 		</script>
 	</head>
 	
-	<body onload="run();" background="back.jpg" style="color:#FFF">
-		<font face="arial">
-			<div id="idPartie">
-				<a id="idCacherMontrerCartes" onclick="cacherMontrerCartes()" href="#"> Cacher les cartes</a><br/>
-				<font size="5">
-					<div id="idCartesJoueurs">
-						<strong>Joueur 1 : <span id="idJoueur1Role"></span></strong>
-						<span id="idJoueur1"></span>
-						
-						<strong>Joueur 2 : <span id="idJoueur2Role"></span></strong>
-						<span id="idJoueur2"></span><br/><br/>
-					</div>
-					<br/>
-				</font>
+	<body onload="run();">
+		<br/>
+		<a id="idCacherMontrerCartes" onclick="cacherMontrerCartes()" href="#"> Cacher les cartes</a><br/>
+		<div id="idCartesJoueurs" style="display: block;">
+			<strong>
+				<span class="joueur">
+					Joueur 1 : <span id="idJoueur1Role"></span>
+					<span id="idJoueur1"></span>
+				</span>
 				
-				<div id="gauche">
-					<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')">Tirer 1<sup>ère</sup> carte</button>
-					<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')">Tirer 2<sup>nde</sup> carte</button>
-					<!-- button id="idButtonCarte3" onclick="masquerAfficher2cartes()">Masquer/afficher</button -->
-					
-					<font size="6">
-						<strong><span id="idCarte1"> </span>
-						<span id="idCarte2"> </span></strong>
-					</font>
-				</div>
-				
-				<div id="centre">
-					<button id="idTourneMaladie" onclick="tourneMaladie()">Tirer carte épidémie</button>
-					<button onclick="nouveauTour()" id="idNouveauTour">GO...</button>
-					<font size="5">
-						<strong><span id="idCartesPropagation"><br/></span></strong>
-					</font>
-				</div>
-				
-				
-				<div id="droite">
-					<p align="center">
-						<iframe title="Minuteur" width="400" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"></iframe>
-					</p>
-				</div>
-				
-				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-				<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-				
-				<div id="idRecap">
-					
-				</div>
-				
-				<a id="idCacherMontrerEpidemie" onclick="cacherMontrerEpidemie()" href="#">SPOIL</a><br/>
-				<div id="idCartesEpidemie" >
-					<span id="idToutPaquet" style="color:#000"></span>
-				</div>
-				<br/>
-				
-				<span id="idPaquetEpidemiesEntier" style="color:#000"></span>
-				
-			</div>
-		</font>
+				<span class="joueur">
+					Joueur 2 : <span id="idJoueur2Role"></span>
+					<span id="idJoueur2"></span><br/><br/>
+				</span>
+			</strong>
+		</div>
+		<br/>
 		
+		<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled>Tirer 1<sup>ère</sup> carte</button>
+		<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>
+		<center>
+			<button id="idTournePropagation" onclick="tournePropogation()">Tirer carte propagation</button>
+			<button onclick="nouveauTour()" id="idNouveauTour" disabled>GO...</button>
+		</center>
+		
+		
+		<div class="pasEnCours" id="idCarteJoueurs" style="display: block;">
+			<strong><span id="idCarte1">... </span>
+			<span id="idCarte2"> </span></strong>
+		</div>
+		
+		<div class="enCours" id="idDivCartesPropagation">
+			<strong><span id="idCartesPropagation"><br/></span></strong>
+		</div>
+		
+		
+		<div class="pasEnCours">
+			<p align="center">
+				<iframe title="Minuteur" width="400" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"></iframe>
+			</p>
+		</div>
+		
+		<div class="lienPartie">
+			La partie vous a plû ? Vous voulez la partager ? Voici le <a id="lien" href="#">lien de la partie</span>.
+		</div>
+
+		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+		
+		<div id="idRecap">
+			
+		</div>
+		
+		<a id="idCacherMontrerEpidemie" onclick="cacherMontrerEpidemie()" href="#">SPOIL</a><br/>
+		<div id="idCartesEpidemie" style="display: none;">
+			<span id="idToutPaquet" style="color:#000"></span>
+		</div>
+		<br/>
+		
+		<span id="idpaquetPropagationEntier" style="color:#000"></span>
+			
 	</body>
 	
 </html>
