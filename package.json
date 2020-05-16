@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "name": "scenariopandemic",
+  "app-name": "scenariopandemic",
+  "package-name": "scenariopandemic",
+  "project-type": "webview",
+  "icon": "./assets/icon/icon.png",
+  "dist-path": "./dist",
+  "permission": [
+    "android.permission.INTERNET"
+  ],
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "androidjs": "^2.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Potaw/ScenarioPandemic.git"
+  },
+  "author": "e-games",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Potaw/ScenarioPandemic/issues"
+  },
+  "homepage": "https://github.com/Potaw/ScenarioPandemic#readme"
+}
