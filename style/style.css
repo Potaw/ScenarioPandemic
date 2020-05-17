@@ -1,0 +1,33 @@
+body {
+	font-family:arial;
+	color:black;
+	background: no-repeat;
+	background-color:OldLace;
+	background-position: top right;
+	background-size: 8%;
+	background-image:url("../images/survival.png");
+}
+
+.enCours {
+	float:left;
+	width:40%;
+	font-size: 30pt;
+}
+
+.pasEnCours {
+	float:left;
+	width:25%;
+	font-size: 20pt;
+}
+
+.joueur {
+	float:left;
+	width:50%;
+	font-size: 30pt;
+}
+
+.lienPartie {
+	float:left;
+	width:100%;
+	font-size: 10pt;
+}
