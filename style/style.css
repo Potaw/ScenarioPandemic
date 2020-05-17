@@ -28,5 +28,6 @@ body {
 
 .lienPartie {
 	float:left;
-	font-size: 14pt;
+	width:100%;
+	font-size: 10pt;
 }
