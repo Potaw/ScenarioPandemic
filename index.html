@@ -3,11 +3,12 @@
 	<head>
 		<title>Scénarios Pandémie</title>
 		<meta charset="utf-8">
+		<link rel="icon" href="images/survival.ico" />
 		<link rel="stylesheet" href="style/style.css">
 		<script>
 			
 			/** Définition des constantes de l'ensemble des cartes */
-			const bleu = ['Atlanta', 'New York', 'Whashington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersburg'];
+			const bleu = ['Atlanta', 'New York', 'Whashington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersbourg'];
 			const jaune = ['Los Angeles', 'Mexico', 'Miami', 'Bogota', 'Lima', 'Santiago', 'Buenos Aires', 'Sao Paulo', 'Lagos', 'Khartoum', 'Kinshasa', 'Johannesburg'];
 			const noir = ['Alger', 'Le Caire', 'Istanbul', 'Moscou', 'Téhéran', 'Bagdad', 'Riyad', 'Karachi', 'Delhi', 'Mumbai', 'Calcutta', 'Chennai'];
 			const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho Chi Minh Ville', 'Bangkok', 'Hong Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
@@ -118,7 +119,7 @@
 					shuffle(rolesShuffle);
 				}
 				
-				// Si le pauetJoueur est passé en paramètre, on le prend
+				// Si le paquetJoueur est passé en paramètre, on le prend
 				if(vars['paquetJoueur'].length >= 1) {
 					paquetJoueur = decodeURI(vars['paquetJoueur']).split('*');
 				}
