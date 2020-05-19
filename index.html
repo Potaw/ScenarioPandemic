@@ -8,7 +8,7 @@
 		<script>
 			
 			/** Définition des constantes de l'ensemble des cartes */
-			const bleu = ['Atlanta', 'New York', 'Whashington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersbourg'];
+			const bleu = ['Atlanta', 'New York', 'Washington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersbourg'];
 			const jaune = ['Los Angeles', 'Mexico', 'Miami', 'Bogota', 'Lima', 'Santiago', 'Buenos Aires', 'Sao Paulo', 'Lagos', 'Khartoum', 'Kinshasa', 'Johannesburg'];
 			const noir = ['Alger', 'Le Caire', 'Istanbul', 'Moscou', 'Téhéran', 'Bagdad', 'Riyad', 'Karachi', 'Delhi', 'Mumbai', 'Calcutta', 'Chennai'];
 			const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho Chi Minh Ville', 'Bangkok', 'Hong Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
@@ -70,17 +70,20 @@
 			}
 			
 			
-			/** Permet de retirer les 4 premières cartes du paquet joueur */
+			/** Permet de retirer les 4 premières cartes du paquet joueur
+				ainsi que les roles des 2 joueurs */
 			function miseEnPlaceJoueur(idJoueur) {
 				var cartes = "<ul>";
 				var carte = "";
+				var role=rolesShuffle.shift();
 				for(i = 0 ; i <= 3 ; i++) {
 					carte = paquetJoueur.shift();
 					cartes += "<li><font color='" + getCouleur(carte) + "'>" + carte + "</font></li>";
 				}
 				cartes += "</ul>";
 				document.getElementById(idJoueur).innerHTML = cartes;
-				document.getElementById(idJoueur + 'Role').innerHTML = rolesShuffle.shift();
+				document.getElementById(idJoueur + 'Role').innerHTML = role;
+				document.getElementById(idJoueur + 'Image').innerHTML = '<img src=images/' + encodeURI(role) +'.png width=100 height=130 class="zoomA">';
 			}
 			
 			
@@ -234,6 +237,13 @@
 				// On prend la prochaine carte du paquet
 				var carte = paquetJoueur.shift();
 				document.getElementById(idCarte).innerHTML = "<font color='" + getCouleur(carte) + "'>" + carte + "</font>";
+				if (epidemies.indexOf(carte) >= 0) {
+					document.getElementById(idCarte + 'Image').innerHTML = '<center><img src=images/' + encodeURI(carte) +'.png width=100 height=130 class="zoomA"></center>';
+				}
+                else {
+					document.getElementById(idCarte + 'Image').innerHTML = '';
+				}
+
 				document.getElementById('idRecap').innerHTML += carte + "<br />";
 			}
 			
@@ -394,6 +404,9 @@
 			
 			/** Lorqu'on clique sur "GO role" */
 			function nouveauTour() {
+
+				document.getElementById('idCarte1Image').innerHTML = '';
+				document.getElementById('idCarte2Image').innerHTML = '';
 				document.getElementById('idButtonCarte1').disabled = false;
 				document.getElementById('idCarte1').style.display = "none";
 				document.getElementById('idCarte2').style.display = "none";
@@ -502,11 +515,13 @@
 			<strong>
 				<span class="joueur">
 					Joueur 1 : <span id="idJoueur1Role"></span>
+					<span id="idJoueur1Image"></span>
 					<span id="idJoueur1"></span>
 				</span>
 				
 				<span class="joueur">
 					Joueur 2 : <span id="idJoueur2Role"></span>
+					<span id="idJoueur2Image"></span>
 					<span id="idJoueur2"></span><br/><br/>
 				</span>
 			</strong>
@@ -523,7 +538,9 @@
 		
 		<div class="pasEnCours" id="idCarteJoueurs" style="display: block;">
 			<strong><span id="idCarte1">... </span>
+			<span id="idCarte1Image"></span>
 			<span id="idCarte2"> </span></strong>
+			<span id="idCarte2Image"></span>
 		</div>
 		
 		<div class="enCours" id="idDivCartesPropagation">
