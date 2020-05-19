@@ -238,8 +238,12 @@
 				var carte = paquetJoueur.shift();
 				document.getElementById(idCarte).innerHTML = "<font color='" + getCouleur(carte) + "'>" + carte + "</font>";
 				if (epidemies.indexOf(carte) >= 0) {
-					document.getElementById(idCarte + 'Image').innerHTML = '<img src=images/' + encodeURI(carte) +'.png width=100 height=130 class="zoomA">';
+					document.getElementById(idCarte + 'Image').innerHTML = '<center><img src=images/' + encodeURI(carte) +'.png width=100 height=130 class="zoomA"></center>';
 				}
+                else {
+					document.getElementById(idCarte + 'Image').innerHTML = '';
+				}
+
 				document.getElementById('idRecap').innerHTML += carte + "<br />";
 			}
 			
@@ -400,6 +404,9 @@
 			
 			/** Lorqu'on clique sur "GO role" */
 			function nouveauTour() {
+
+				document.getElementById('idCarte1Image').innerHTML = '';
+				document.getElementById('idCarte2Image').innerHTML = '';
 				document.getElementById('idButtonCarte1').disabled = false;
 				document.getElementById('idCarte1').style.display = "none";
 				document.getElementById('idCarte2').style.display = "none";
