@@ -9,6 +9,14 @@ body {
 	background-image:url("../images/survival.png");
 }
 
+header {
+	width: 92%;
+	text-align: center;
+	padding: 5px;
+	background-color: DarkSalmon;
+	color: white;
+}
+
 .enCours {
 	float:left;
 	width:40%;
