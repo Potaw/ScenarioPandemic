@@ -1,5 +1,6 @@
 body {
 	font-family:arial;
+	font-size: 10pt;
 	color:black;
 	background: no-repeat;
 	background-color:OldLace;
@@ -16,7 +17,14 @@ body {
 
 .pasEnCours {
 	float:left;
-	width:25%;
+	width:30%;
+	font-size: 20pt;
+}
+
+.chrono {
+	height:400px;
+	float:left;
+	width:30%;
 	font-size: 20pt;
 }
 
@@ -26,8 +34,18 @@ body {
 	font-size: 30pt;
 }
 
-.lienPartie {
-	float:left;
+.divStandard {
 	width:100%;
-	font-size: 10pt;
+	clear:left;
+}
+
+footer {
+	text-align: center;
+	padding: 5px;
+	background-color: DarkSalmon;
+	color: white;
+}
+
+.debug {
+	display: none;
 }
