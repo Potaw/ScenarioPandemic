@@ -11,9 +11,11 @@ function run () {
 	    var label = document.createElement("label");
 	    checkBox.type = "checkbox";
 	    checkBox.value = roles[i];
+	    checkBox.id = "id"+i;
 	    myDiv.appendChild(checkBox);
 	    myDiv.appendChild(label);
 	    label.appendChild(document.createTextNode(roles[i]));
+        label.htmlFor = "id"+i;
 	}
 }
 
