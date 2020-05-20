@@ -7,6 +7,7 @@ function run () {
 	for (var i = 0; i < roles.length; i++) {
 		var checkBox = document.createElement("input");
 		var label = document.createElement("label");
+		var img = document.createElement("img");
 		checkBox.type = "checkbox";
 		checkBox.value = roles[i];
 		checkBox.id = "id"+i;
@@ -14,6 +15,8 @@ function run () {
 		myDiv.appendChild(label);
 		label.appendChild(document.createTextNode(roles[i]));
 		label.htmlFor = "id"+i;
+		img.src = './../images/' + encodeURI(roles[i]) + '.png'
+		label.appendChild(img);
 	}
 }
 
