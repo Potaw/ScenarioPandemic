@@ -9,6 +9,14 @@ body {
 	background-image:url("../images/survival.png");
 }
 
+header {
+	width: 92%;
+	text-align: center;
+	padding: 5px;
+	background-color: DarkSalmon;
+	color: white;
+}
+
 .enCours {
 	float:left;
 	width:40%;
@@ -23,7 +31,7 @@ body {
 
 .chrono {
 	height:400px;
-	float:left;
+	float:right;
 	width:30%;
 	font-size: 20pt;
 }
@@ -36,7 +44,11 @@ body {
 
 .divStandard {
 	width:100%;
-	clear:left;
+	clear:both;
+}
+
+.goJoueur {
+	font-size: 20pt;
 }
 
 footer {

@@ -27,6 +27,9 @@
 			var pseudos = [];
 			var lienSansPseudo = "";
 			
+			// Permet de bien compter le nombre de tour
+			var isChronoDejaTourne = false;
+			
 			var url = "";
 			
 			/** Retourne un nombre aléatoire entre min et max */
@@ -213,8 +216,14 @@
 				document.getElementById('idCarte1').style.display = "block";
 				document.getElementById('idCarte2').style.display = "block";
 				
+				document.getElementById('idCarteJoueurs').className = 'enCours';
+				document.getElementById('idDivCartesPropagation').className = 'pasEnCours';
+				
 				var isIdCarte1 = idCarte == 'idCarte1';
 				if (isIdCarte1) {
+					isChronoDejaTourne = false;
+					document.getElementById('idGoJoueur').className = "";
+					document.getElementById('idCartesPropagation').innerHTML = "<br/>";
 					isPseudoGagnePerduCeTour("J");
 					document.getElementById('idCarte2').innerHTML = "...";
 					document.getElementById('idButtonCarte1').style.display = "none";
@@ -380,6 +389,7 @@
 			function tournePropogation(){
 				nbCartesPropagationTournees++;
 				
+				document.getElementById('idCartesPropagation').style.display = "block";
 				document.getElementById('idCarteJoueurs').className = 'pasEnCours';
 				document.getElementById('idDivCartesPropagation').className = 'enCours';
 				
@@ -396,26 +406,35 @@
 				if (carte.charAt(0) == carte.charAt(2)) {
 					var joueur = (paquetJoueur.length + 1) % 4 == 0 ? 1 : 2;
 					document.getElementById('idTournePropagation').disabled = true;
-					document.getElementById('idNouveauTour').innerHTML = "Go => " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
-					document.getElementById('idNouveauTour').disabled = false;
+					document.getElementById('idGoJoueur').innerHTML = "Tour : " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
+					document.getElementById('idGoJoueur').className = "goJoueur";
 				}
 				isPseudoGagnePerduCeTour("P");
 			}
 			
-			/** Lorqu'on clique sur "GO role" */
+			/** Réaffiche le tour en cours */
+			function reAfficher() {
+				document.getElementById('idButtonCarte1').disabled = true;
+				document.getElementById('idCarte1').style.display = "block";
+				document.getElementById('idCarte2').style.display = "block";
+				document.getElementById('idCartesPropagation').style.display = "block";
+			}
+			
+			/** Lorqu'on est en survol du chrono */
 			function nouveauTour() {
-
-				document.getElementById('idCarte1Image').innerHTML = '';
-				document.getElementById('idCarte2Image').innerHTML = '';
-				document.getElementById('idButtonCarte1').disabled = false;
-				document.getElementById('idCarte1').style.display = "none";
-				document.getElementById('idCarte2').style.display = "none";
-				document.getElementById('idNouveauTour').disabled = true;
-				document.getElementById('idCartesPropagation').innerHTML = "<br/>";
-				nbTours++;
-				document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idNouveauTour').innerHTML + "</b><br />";
-				document.getElementById('idCarteJoueurs').className = 'enCours';
-				document.getElementById('idDivCartesPropagation').className = 'pasEnCours';
+				if (document.getElementById('idGoJoueur').className == "goJoueur") {
+					document.getElementById('idButtonCarte1').disabled = false;
+					document.getElementById('idCarte1').style.display = "none";
+					document.getElementById('idCarte2').style.display = "none";
+					document.getElementById('idCartesPropagation').style.display = "none";
+					document.getElementById('idCarte1Image').innerHTML = '';
+					document.getElementById('idCarte2Image').innerHTML = '';
+					if (isChronoDejaTourne == false) {
+						nbTours++;
+						isChronoDejaTourne = true;
+						document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idGoJoueur').innerHTML + "</b><br />";
+					}
+				}
 			}
 			
 			/** Partie terminée */
@@ -469,7 +488,7 @@
 				else if (document.getElementById('idTournePropagation').disabled == false) {
 					tournePropogation();
 				}
-				else if (document.getElementById('idNouveauTour').disabled == false) {
+				else if (document.getElementById('idGoJoueur').disabled == false) {
 					nouveauTour();
 				}
 				else if (document.getElementById('idButtonCarte1').style.display == "block") {
@@ -508,6 +527,10 @@
 	</head>
 	
 	<body onload="run();">
+		<header>
+			Bienvenu à Scénario Pandemic, sénario aléatoire du type demis-finales du championnat du monde
+		</header>
+		
 		Cartes joueurs : <a id="idLienCartesJoueurs" onclick="cacherAfficherCartes('idCartesJoueurs', 'idLienCartesJoueurs')" href=javascript:void(0);>Cacher</a><br/>
 		
 		
@@ -533,7 +556,7 @@
 		<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>
 		<center>
 			<button id="idTournePropagation" onclick="tournePropogation()">Tirer carte propagation</button>
-			<button onclick="nouveauTour()" id="idNouveauTour" disabled>GO...</button>
+			<span id="idGoJoueur" onmouseover="reAfficher();">Tour...</span>
 		</center>
 		
 		<div class="pasEnCours" id="idCarteJoueurs" style="display: block;">
@@ -550,7 +573,7 @@
 		
 		<div class="chrono">
 			<p align="center">
-				<iframe title="Minuteur" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"></iframe>
+				<iframe title="Minuteur" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html" onmouseover="nouveauTour();"></iframe>
 			</p>
 		</div>
 		
@@ -590,7 +613,7 @@
 		</div>
 		
 		<footer>
-			v0.3.0<br />
+			v0.4.0<br />
 			Author : Potaw (CDM 2019 avec Yo)
 		</footer>
 		
