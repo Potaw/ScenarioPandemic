@@ -31,7 +31,7 @@ header {
 
 .chrono {
 	height:400px;
-	float:left;
+	float:right;
 	width:30%;
 	font-size: 20pt;
 }
@@ -44,7 +44,11 @@ header {
 
 .divStandard {
 	width:100%;
-	clear:left;
+	clear:both;
+}
+
+.goJoueur {
+	font-size: 20pt;
 }
 
 footer {
