@@ -9,6 +9,14 @@ body {
 	background-image:url("../images/survival.png");
 }
 
+header {
+	width: 92%;
+	text-align: center;
+	padding: 5px;
+	background-color: DarkSalmon;
+	color: white;
+}
+
 .enCours {
 	float:left;
 	width:40%;
@@ -23,7 +31,7 @@ body {
 
 .chrono {
 	height:400px;
-	float:left;
+	float:right;
 	width:30%;
 	font-size: 20pt;
 }
@@ -36,6 +44,24 @@ body {
 
 .divStandard {
 	width:100%;
+	clear:both;
+}
+
+.goJoueur {
+	font-size: 20pt;
+}
+
+.petitsBouttons {
+	float:left;
+	width: 25%;
+}
+
+.grosBouttons {
+	float:left;
+	width: 50%;
+}
+
+.clear {
 	clear:left;
 }
 
@@ -48,4 +74,15 @@ footer {
 
 .debug {
 	display: none;
+}
+
+.zoomA {
+	width: 100;
+	height: 130;
+	/* ease | ease-in | ease-out | linear */
+	transition: transform ease-in-out 0.3s;
+}
+
+.zoomA:hover {
+	transform: scale(4);
 }

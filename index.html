@@ -8,7 +8,7 @@
 		<script>
 			
 			/** Définition des constantes de l'ensemble des cartes */
-			const bleu = ['Atlanta', 'New York', 'Whashington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersbourg'];
+			const bleu = ['Atlanta', 'New York', 'Washington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersbourg'];
 			const jaune = ['Los Angeles', 'Mexico', 'Miami', 'Bogota', 'Lima', 'Santiago', 'Buenos Aires', 'Sao Paulo', 'Lagos', 'Khartoum', 'Kinshasa', 'Johannesburg'];
 			const noir = ['Alger', 'Le Caire', 'Istanbul', 'Moscou', 'Téhéran', 'Bagdad', 'Riyad', 'Karachi', 'Delhi', 'Mumbai', 'Calcutta', 'Chennai'];
 			const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho Chi Minh Ville', 'Bangkok', 'Hong Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
@@ -26,6 +26,9 @@
 			var nbCartesPropagationTournees = 0
 			var pseudos = [];
 			var lienSansPseudo = "";
+			
+			// Permet de bien compter le nombre de tour
+			var isChronoDejaTourne = false;
 			
 			var url = "";
 			
@@ -70,17 +73,20 @@
 			}
 			
 			
-			/** Permet de retirer les 4 premières cartes du paquet joueur */
+			/** Permet de retirer les 4 premières cartes du paquet joueur
+				ainsi que les roles des 2 joueurs */
 			function miseEnPlaceJoueur(idJoueur) {
 				var cartes = "<ul>";
 				var carte = "";
+				var role=rolesShuffle.shift();
 				for(i = 0 ; i <= 3 ; i++) {
 					carte = paquetJoueur.shift();
 					cartes += "<li><font color='" + getCouleur(carte) + "'>" + carte + "</font></li>";
 				}
 				cartes += "</ul>";
 				document.getElementById(idJoueur).innerHTML = cartes;
-				document.getElementById(idJoueur + 'Role').innerHTML = rolesShuffle.shift();
+				document.getElementById(idJoueur + 'Role').innerHTML = role;
+				document.getElementById(idJoueur + 'Image').innerHTML = '<img src=images/' + encodeURI(role) +'.png width=100 height=130 class="zoomA">';
 			}
 			
 			
@@ -210,8 +216,14 @@
 				document.getElementById('idCarte1').style.display = "block";
 				document.getElementById('idCarte2').style.display = "block";
 				
+				document.getElementById('idCarteJoueurs').className = 'enCours';
+				document.getElementById('idDivCartesPropagation').className = 'pasEnCours';
+				
 				var isIdCarte1 = idCarte == 'idCarte1';
 				if (isIdCarte1) {
+					isChronoDejaTourne = false;
+					document.getElementById('idGoJoueur').className = "";
+					document.getElementById('idCartesPropagation').innerHTML = "";
 					isPseudoGagnePerduCeTour("J");
 					document.getElementById('idCarte2').innerHTML = "...";
 					document.getElementById('idButtonCarte1').style.display = "none";
@@ -234,6 +246,13 @@
 				// On prend la prochaine carte du paquet
 				var carte = paquetJoueur.shift();
 				document.getElementById(idCarte).innerHTML = "<font color='" + getCouleur(carte) + "'>" + carte + "</font>";
+				if (epidemies.indexOf(carte) >= 0) {
+					document.getElementById(idCarte + 'Image').innerHTML = '<center><img src=images/' + encodeURI(carte) +'.png width=100 height=130 class="zoomA"></center>';
+				}
+                else {
+					document.getElementById(idCarte + 'Image').innerHTML = '';
+				}
+
 				document.getElementById('idRecap').innerHTML += carte + "<br />";
 			}
 			
@@ -370,6 +389,7 @@
 			function tournePropogation(){
 				nbCartesPropagationTournees++;
 				
+				document.getElementById('idCartesPropagation').style.display = "block";
 				document.getElementById('idCarteJoueurs').className = 'pasEnCours';
 				document.getElementById('idDivCartesPropagation').className = 'enCours';
 				
@@ -386,23 +406,37 @@
 				if (carte.charAt(0) == carte.charAt(2)) {
 					var joueur = (paquetJoueur.length + 1) % 4 == 0 ? 1 : 2;
 					document.getElementById('idTournePropagation').disabled = true;
-					document.getElementById('idNouveauTour').innerHTML = "Go => " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
-					document.getElementById('idNouveauTour').disabled = false;
+					document.getElementById('idOneClick').disabled = true;
+					document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte1').innerHTML;
+					document.getElementById('idGoJoueur').innerHTML = "Tour : " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
+					document.getElementById('idGoJoueur').className = "goJoueur";
 				}
 				isPseudoGagnePerduCeTour("P");
 			}
 			
-			/** Lorqu'on clique sur "GO role" */
+			/** Réaffiche le tour en cours */
+			function reAfficher() {
+				document.getElementById('idButtonCarte1').disabled = true;
+				document.getElementById('idCarte1').style.display = "block";
+				document.getElementById('idCarte2').style.display = "block";
+				document.getElementById('idCartesPropagation').style.display = "block";
+			}
+			
+			/** Lorqu'on est en survol du chrono */
 			function nouveauTour() {
-				document.getElementById('idButtonCarte1').disabled = false;
-				document.getElementById('idCarte1').style.display = "none";
-				document.getElementById('idCarte2').style.display = "none";
-				document.getElementById('idNouveauTour').disabled = true;
-				document.getElementById('idCartesPropagation').innerHTML = "<br/>";
-				nbTours++;
-				document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idNouveauTour').innerHTML + "</b><br />";
-				document.getElementById('idCarteJoueurs').className = 'enCours';
-				document.getElementById('idDivCartesPropagation').className = 'pasEnCours';
+				if (document.getElementById('idGoJoueur').className == "goJoueur") {
+					document.getElementById('idButtonCarte1').disabled = false;
+					document.getElementById('idCarte1').style.display = "none";
+					document.getElementById('idCarte2').style.display = "none";
+					document.getElementById('idCartesPropagation').style.display = "none";
+					document.getElementById('idCarte1Image').innerHTML = '';
+					document.getElementById('idCarte2Image').innerHTML = '';
+					if (isChronoDejaTourne == false) {
+						nbTours++;
+						isChronoDejaTourne = true;
+						document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idGoJoueur').innerHTML + "</b><br />";
+					}
+				}
 			}
 			
 			/** Partie terminée */
@@ -447,20 +481,24 @@
 				document.getElementById('idDivDebug').style.display = document.getElementById('idDebug').checked ? "block" : "none";
 			}
 			
+			/** */
+			function rendVisibleOneClick() {
+				document.getElementById('idOneClick').disabled = false;
+			}
+			
 			/** Bouton unique pour gagner du temps :) */
 			function oneClick() {
 				//alert(document.getElementById('idButtonCarte1').disabled);
 				if (document.getElementById('idButtonCarte2').style.display == "block") {
 					tirerCartes('idCarte2');
+					document.getElementById('idOneClick').innerHTML = document.getElementById('idTournePropagation').innerHTML;
 				}
 				else if (document.getElementById('idTournePropagation').disabled == false) {
 					tournePropogation();
 				}
-				else if (document.getElementById('idNouveauTour').disabled == false) {
-					nouveauTour();
-				}
 				else if (document.getElementById('idButtonCarte1').style.display == "block") {
 					tirerCartes('idCarte1');
+					document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte2').innerHTML;
 				}
 				else {
 					alert("rien");
@@ -495,6 +533,10 @@
 	</head>
 	
 	<body onload="run();">
+		<header>
+			Bienvenu à Scénario Pandemic, sénario aléatoire du type demis-finales du championnat du monde
+		</header>
+		
 		Cartes joueurs : <a id="idLienCartesJoueurs" onclick="cacherAfficherCartes('idCartesJoueurs', 'idLienCartesJoueurs')" href=javascript:void(0);>Cacher</a><br/>
 		
 		
@@ -502,38 +544,56 @@
 			<strong>
 				<span class="joueur">
 					Joueur 1 : <span id="idJoueur1Role"></span>
+					<span id="idJoueur1Image"></span>
 					<span id="idJoueur1"></span>
 				</span>
 				
 				<span class="joueur">
 					Joueur 2 : <span id="idJoueur2Role"></span>
+					<span id="idJoueur2Image"></span>
 					<span id="idJoueur2"></span><br/><br/>
 				</span>
 			</strong>
 		</div>
 		<br/>
 		
-		<!-- button onclick="oneClick()" align="right" class="debug">oneClick</button-->
-		<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled style="display: block;">Tirer 1<sup>ère</sup> carte</button>
-		<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>
-		<center>
-			<button id="idTournePropagation" onclick="tournePropogation()">Tirer carte propagation</button>
-			<button onclick="nouveauTour()" id="idNouveauTour" disabled>GO...</button>
-		</center>
+		<div class="petitsBouttons">
+			<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled style="display: block;">Tirer 1<sup>ère</sup> carte</button>
+			<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>
+		</div>
+		
+		<div class="grosBouttons">
+			<center>
+				<button id="idTournePropagation" onclick="tournePropogation()">Tirer carte propagation</button>
+				<span id="idGoJoueur" onmouseover="reAfficher();">Tour...</span>
+			</center>
+		</div>
+		
+		<div class="petitsBouttons">
+			<button onclick="oneClick()" align="right" id="idOneClick">oneClick</button>
+		</div>
+		
+		<div class="clear">
+			
+		</div>
+		
 		
 		<div class="pasEnCours" id="idCarteJoueurs" style="display: block;">
 			<strong><span id="idCarte1">... </span>
+			<span id="idCarte1Image"></span>
 			<span id="idCarte2"> </span></strong>
+			<span id="idCarte2Image"></span>
 		</div>
 		
 		<div class="enCours" id="idDivCartesPropagation">
-			<strong><span id="idCartesPropagation"><br/></span></strong>
+			<strong><span id="idCartesPropagation"> </span></strong>
 		</div>
 		
 		
 		<div class="chrono">
 			<p align="center">
-				<iframe title="Minuteur" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"></iframe>
+				<iframe title="Minuteur" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"
+				        onmouseover="nouveauTour();" onmouseout="rendVisibleOneClick()"></iframe>
 			</p>
 		</div>
 		
@@ -573,8 +633,8 @@
 		</div>
 		
 		<footer>
-			v0.3.0<br />
-			Author : Potaw (CDM 2019 avec Yo)
+			v0.5.0<br />
+			Authors : Potaw (CDM 2019 avec Yo) et Fk (sparring de la CDM 2019)
 		</footer>
 		
 	</body>
