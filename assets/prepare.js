@@ -2,22 +2,37 @@
 
 /** Fonction principale, affiche les personnages: checkbox + image */
 function run () {
-	var myDiv = document.getElementById("idBoxes");
+	var myForm = document.getElementById("idBoxes");
+	var table = document.createElement("TABLE");
+	var row_number = 0;
 
 	for (var i = 0; i < roles.length; i++) {
+
+		if ( i % 5 == 0 ) {
+			var row = document.createElement("tr");
+			table.appendChild(row);
+		}
+		var cell = document.createElement("td");
+		cell.style.border = "solid #E9967A";
+		row.appendChild(cell);
 		var checkBox = document.createElement("input");
 		var label = document.createElement("label");
 		var img = document.createElement("img");
+		var br = document.createElement("BR");
 		checkBox.type = "checkbox";
 		checkBox.value = roles[i];
 		checkBox.id = "id"+i;
-		myDiv.appendChild(checkBox);
-		myDiv.appendChild(label);
+		cell.appendChild(checkBox);
+		cell.appendChild(label);
 		label.appendChild(document.createTextNode(roles[i]));
 		label.htmlFor = "id"+i;
-		img.src = './../images/' + encodeURI(roles[i]) + '.png'
+		img.src = './../images/' + encodeURI(roles[i]) + '.png';
+		img.width = "200";
+		img.height = "260";
+		label.appendChild(br);
 		label.appendChild(img);
 	}
+	myForm.appendChild(table);
 }
 
 /** onclick, on recupere les roles du form sinon on les choisit aléatoirement */
