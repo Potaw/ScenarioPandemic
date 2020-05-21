@@ -51,6 +51,20 @@ header {
 	font-size: 20pt;
 }
 
+.petitsBouttons {
+	float:left;
+	width: 25%;
+}
+
+.grosBouttons {
+	float:left;
+	width: 50%;
+}
+
+.clear {
+	clear:left;
+}
+
 footer {
 	text-align: center;
 	padding: 5px;
