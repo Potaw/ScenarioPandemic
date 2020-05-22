@@ -74,6 +74,7 @@ function get_roles (form) {
 
 	shuffle(choice);
 	window.location.replace("../views/game.html?" +
-					"&roleJoueur1=" +  encodeURI(choice[0]) +
+					// bug fix
+					"roleJoueur1=" +  encodeURI(choice[0]) +
 					"&roleJoueur2=" +  encodeURI(choice[1]));
 }
