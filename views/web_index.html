@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<title>Scénarios Pandémie</title>
+	<meta charset="utf-8">
+	<link rel="icon" href="../images/survival.ico" />
+	<link rel="stylesheet" href="../style/style.css">
+	<script type="text/javascript" src = "../assets/cards.js"></script>
+	<script type="text/javascript" src = "../assets/game.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="../assets/client.js"></script>
+</head>
+
+<body>
+<header>
+	Bienvenue à Scénario Pandemic, scénario aléatoire du type demi-finales du championnat du monde
+</header>
+<div>
+    <button id="idStartGame" onclick="startGame()">Démarrer la partie</button>
+</div>
+Cartes joueurs : <a id="idLienCartesJoueurs" onclick="cacherAfficherCartes('idCartesJoueurs', 'idLienCartesJoueurs')" href=javascript:void(0);>Cacher</a><br/>
+
+
+<div id="idCartesJoueurs" style="display: block;">
+	<strong>
+				<span class="joueur">
+					Joueur 1 : <span id="idJoueur1Role"></span>
+					<span id="idJoueur1Image"></span>
+					<span id="idJoueur1"></span>
+				</span>
+
+		<span class="joueur">
+					Joueur 2 : <span id="idJoueur2Role"></span>
+					<span id="idJoueur2Image"></span>
+					<span id="idJoueur2"></span><br/><br/>
+				</span>
+	</strong>
+</div>
+<br/>
+
+<div class="petitsBouttons">
+	<button id="idButtonCarte1" onclick="tirerCartes('idCarte1')" disabled style="display: block;">Tirer 1<sup>ère</sup> carte</button>
+	<button id="idButtonCarte2" onclick="tirerCartes('idCarte2')" style="display: none;">Tirer 2<sup>nde</sup> carte</button>
+</div>
+
+<div class="grosBouttons">
+	<center>
+		<button id="idTournePropagation" onclick="tournePropogation()">Tirer carte propagation</button>
+		<span id="idGoJoueur" onmouseover="reAfficher();">Tour...</span>
+	</center>
+</div>
+
+<div class="petitsBouttons">
+	<button onclick="oneClick()" align="right" id="idOneClick">oneClick</button>
+</div>
+
+<div class="clear">
+
+</div>
+
+
+<div class="pasEnCours" id="idCarteJoueurs" style="display: block;">
+	<strong><span id="idCarte1">... </span>
+		<span id="idCarte1Image"></span>
+		<span id="idCarte2"> </span></strong>
+	<span id="idCarte2Image"></span>
+</div>
+
+<div class="enCours" id="idDivCartesPropagation">
+	<strong><span id="idCartesPropagation"> </span></strong>
+</div>
+
+
+<div class="chrono">
+	<p align="center">
+		<iframe title="Minuteur" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"
+				onmouseover="nouveauTour();" onmouseout="rendVisibleOneClick()"></iframe>
+	</p>
+</div>
+
+<div class="divStandard">
+	Partie terminée ?<br/>
+	Saisissez votre pseudo (a-zA-Z0-9): <input id="idPseudo" type="text" size="6"></input>
+	<input type="radio" name="radioPartieTerminee" id="idGagne"><label for="idGagne">Gagnée</label></input>
+	<input type="radio" name="radioPartieTerminee" id="idPerdu"><label for="idPerdu">Perdue</label></input>
+	<input type="button" onclick="partieTerminee()" value="Partie terminée" />
+</div>
+
+<div class="divStandard">
+	La partie vous a plû ? Vous voulez la partager ? <input type="button" onclick="genererLienParie()" value="Générer le lien" />
+	<span id="idSpanLienPartie" style="display:none;"><br />Voici le <a id="idLienPartie" href=javascript:void(0);>lien de la partie</a>.</span>
+</div>
+
+<div class="divStandard">
+	<br />
+	<input id="idDebug" type="checkbox" onclick="debug()" /><label for="idDebug">debug</label></input>
+</div>
+
+<div class="divStandard" id="idDivDebug" style="display:none;">
+	<br />
+	Récap des tours passés : <a id="idLienRecap"  onclick="cacherAfficherCartes('idRecap', 'idLienRecap')" href="javascript:void(0);">Montrer</a><br/>
+	<div id="idRecap" style="display: none;"> </div>
+
+	Spoil, paquet joueur <a id="idLienSpoilPaquetJoueur" onclick="cacherAfficherCartes('idSpoilPaquetJoueur', 'idLienSpoilPaquetJoueur')" href="javascript:void(0);">Montrer</a><br/>
+	<div id="idSpoilPaquetJoueur" style="display: none;"> </div>
+
+	Spoil, paquet propagation <a id="idLienSpoilPaquetPropagation" onclick="cacherAfficherCartes('idSpoilPaquetPropagation', 'idLienSpoilPaquetPropagation')" href=javascript:void(0);>Montrer</a><br/>
+	<div id="idSpoilPaquetPropagation" style="display: none;"> </div>
+
+	Spoil, historique des joueurs de cette partie <a id="idLienSpoilHistoJoueurs" onclick="historiquePartie()" href=javascript:void(0);>Montrer</a><br/>
+	<div id="idSpoilHistoJoueurs" style="display: none;">
+
+	</div>
+</div>
+
+<footer>
+	v0.5.0<br />
+	Authors : Potaw (CDM 2019 avec Yo) et Fk (sparring de la CDM 2019)
+</footer>
+
+</body>
+
+</html>
