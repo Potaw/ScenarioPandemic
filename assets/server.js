@@ -3,10 +3,13 @@ var fs = require('fs');
 var server = http.createServer(function (req, res) {
     let path;
     if (req.url === '/') {
-        path = './web_index.html';
+        path = './views/web_index.html';
+    } else if (req.url.startsWith('/game.html')) {
+        path = './views/web_index.html';
     } else {
         path = '.' + req.url.split('?')[0];
     }
+    path = decodeURIComponent(path);
     if (/.(jpg|png)$/.test(path)) {
         fs.readFile(path, 'Base64', function (error, content) {
             res.writeHead(200, {'Content-Type': 'image/jpg'});
@@ -25,44 +28,26 @@ var server = http.createServer(function (req, res) {
     }
 });
 var io = require('socket.io').listen(server);
+io.sockets.on('connection', function (socket) {
+    socket.on('add_new_player', function (pseudo) {
+        socket.pseudo = pseudo;
+        io.sockets.emit('new_player', socket.pseudo);
+    });
+    socket.on('get_players', function () {
+        var clients = io.sockets.clients();
+        var usernames = [];
+        for (var socket in clients.sockets) {
+            usernames.push(clients.sockets[socket].pseudo);
+        }
+        io.sockets.emit('players_list', usernames);
+    });
+    socket.on('get_game_parameters', function (url_parameters) {
+        var new_url_parameters = get_game_parameters(url_parameters);
+        io.sockets.emit('game_parameters', new_url_parameters);
+    });
+});
+server.listen(8080);
 
-
-/** Définition des constantes de l'ensemble des cartes */
-const bleu = ['Atlanta', 'New York', 'Whashington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersbourg'];
-const jaune = ['Los Angeles', 'Mexico', 'Miami', 'Bogota', 'Lima', 'Santiago', 'Buenos Aires', 'Sao Paulo', 'Lagos', 'Khartoum', 'Kinshasa', 'Johannesburg'];
-const noir = ['Alger', 'Le Caire', 'Istanbul', 'Moscou', 'Téhéran', 'Bagdad', 'Riyad', 'Karachi', 'Delhi', 'Mumbai', 'Calcutta', 'Chennai'];
-const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho Chi Minh Ville', 'Bangkok', 'Hong Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
-const evenements = ['Pont aérien', 'Subvention publique', 'Hôpital mobile', 'Rééxaminer les recherches', 'Traitements à distance', 'Ordres spéciaux', 'Temps emprunté', 'Déploiement de vaccins rapides'];
-const epidemies = ['Pente fatale', 'Structure moléculaire complexe', 'Pertes inacceptables', 'Effet chronique', 'Ingérence gouvernementale', 'Populations non calculées'];
-const roles = ['Scientifique', 'Epidémiologiste', 'Opérateur de terrain', 'Spécialiste en quarantaine', 'Généraliste', 'Chercheuse', 'Archiviste', 'Spécialiste en confinement', 'Expert aux opérations', 'Planificateur d\'urgence', 'Médecin'];
-
-/** Variables globales */
-var paquetJoueur;
-var epidemdiesShuffle;
-var rolesShuffle = [];
-var paquetEpidemie;
-var paquetPropagationEntier = [];
-var pseudos = [];
-var lienSansPseudo = "";
-
-/** Retourne un nombre aléatoire entre min et max */
-function randomInt(min, max) {
-    return (min + Math.floor((max - min + 1) * Math.random()));
-}
-
-/** Mélange le tableau passer en paramètre */
-function shuffle(items) {
-    var i, j;
-    var item;
-    if ((!items.length) || (items.length === 1))
-        return;
-    for (i = items.length - 1; i !== 0; i--) {
-        j = randomInt(0, i);
-        item = items[j];
-        items[j] = items[i];
-        items[i] = item;
-    }
-}
 
 function get_game_parameters(url_parameters) {
     // S'il existe des paramètres dans la requête, on s'en sert
@@ -77,28 +62,27 @@ function get_game_parameters(url_parameters) {
             idUnique: ""
         };
     }
-    var idUnique = 0;
 
     if (vars['idUnique'].length >= 1) {
         idUnique = vars['idUnique'];
     }
 
-// Si les rôles sont passés en paramètre, on les prend
+    // Si les rôles sont passés en paramètre, on les prend
     if (vars['roleJoueur1'].length >= 1 && vars['roleJoueur2'].length >= 1) {
         rolesShuffle[0] = decodeURI(vars['roleJoueur1']);
         rolesShuffle[1] = decodeURI(vars['roleJoueur2']);
     }
-// Sinon, on mélange les rôles existants
+    // Sinon, on mélange les rôles existants
     else {
         rolesShuffle = roles.slice();
         shuffle(rolesShuffle);
     }
 
-// Si le paquetJoueur est passé en paramètre, on le prend
+    // Si le paquetJoueur est passé en paramètre, on le prend
     if (vars['paquetJoueur'].length >= 1) {
         paquetJoueur = decodeURI(vars['paquetJoueur']).split('*');
     }
-// Sinon, on le génère
+    // Sinon, on le génère
     else {
         // Tableau temporaire d'évènements
         var evenementsHasard = evenements;
@@ -125,11 +109,11 @@ function get_game_parameters(url_parameters) {
         paquetJoueur.splice(8 + randomInt(0, 8), 0, epidemdiesShuffle.shift());
     }
 
-// Si le paquet propagation est passé en paramètre, on le prend
+    // Si le paquet propagation est passé en paramètre, on le prend
     if (vars['paquetPropagationEntier'].length >= 1) {
         paquetPropagationEntier = decodeURI(vars['paquetPropagationEntier']).split('*');
     }
-// Sinon, on le génère
+    // Sinon, on le génère
     else {
         // Préparation paquet épdémie
         paquetEpidemie = bleu.concat(jaune).concat(noir).concat(rouge);
@@ -141,7 +125,7 @@ function get_game_parameters(url_parameters) {
         prepatationPaquetPropagations();
     }
 
-// On teste s'il y a des pseudos
+    // On teste s'il y a des pseudos
     if (vars['pseudos'].length >= 1) {
         var joueurs = [];
         pseudos = decodeURI(vars['pseudos']).split('*');
@@ -157,15 +141,15 @@ function get_game_parameters(url_parameters) {
         idUnique = Date.now();
     }
 
-
-// On génère le lien de la partie
-    lienSansPseudo = "web_index.html?" +
+    // On génère le lien de la partie
+    lienSansPseudo = "scenariopandemic.html?" +
         (idUnique === 0 ? "" : "idUnique=" + idUnique) +
         "&roleJoueur1=" + encodeURI(rolesShuffle[0]) +
         "&roleJoueur2=" + encodeURI(rolesShuffle[1]) +
         "&paquetJoueur=" + encodeURI(paquetJoueur.join('*')) +
         "&paquetPropagationEntier=" + encodeURI(paquetPropagationEntier.join('*')) +
         "&pseudos=" + vars['pseudos'];
+
     return JSON.parse(
         '{"'
         + decodeURI(
@@ -175,6 +159,44 @@ function get_game_parameters(url_parameters) {
             /=/g,
             "\":\"")) + '"}');
 }
+
+
+/** Définition des constantes de l'ensemble des cartes */
+const bleu = ['Atlanta', 'New York', 'Washington', 'Montreal', 'San Fransisco', 'Londres', 'Paris', 'Essen', 'Madrid', 'Milan', 'Chicago', 'Saint Petersbourg'];
+const jaune = ['Los Angeles', 'Mexico', 'Miami', 'Bogota', 'Lima', 'Santiago', 'Buenos Aires', 'Sao Paulo', 'Lagos', 'Khartoum', 'Kinshasa', 'Johannesburg'];
+const noir = ['Alger', 'Le Caire', 'Istanbul', 'Moscou', 'Téhéran', 'Bagdad', 'Riyad', 'Karachi', 'Delhi', 'Mumbai', 'Calcutta', 'Chennai'];
+const rouge = ['Jakarta', 'Sydney', 'Manille', 'Ho Chi Minh Ville', 'Bangkok', 'Hong Kong', 'Taipei', 'Osaka', 'Tokyo', 'Shanghai', 'Pékin', 'Séoul'];
+const evenements = ['Pont aérien', 'Subvention publique', 'Hôpital mobile', 'Rééxaminer les recherches', 'Traitements à distance', 'Ordres spéciaux', 'Temps emprunté', 'Déploiement de vaccins rapides'];
+const epidemies = ['Pente fatale', 'Structure moléculaire complexe', 'Pertes inacceptables', 'Effet chronique', 'Ingérence gouvernementale', 'Populations non calculées'];
+const roles = ['Scientifique', 'Epidémiologiste', 'Opérateur de terrain', 'Spécialiste en quarantaine', 'Généraliste', 'Chercheuse', 'Archiviste', 'Spécialiste en confinement', 'Expert aux opérations', 'Planificateur d\'urgence', 'Médecin'];
+
+/** Retourne un nombre aléatoire entre min et max */
+function randomInt(min, max) {
+    return (min + Math.floor((max - min + 1) * Math.random()));
+}
+
+/** Mélange le tableau passer en paramètre */
+function shuffle(items) {
+    var i, j;
+    var item;
+    if ((!items.length) || (items.length == 1))
+        return;
+    for (i = items.length - 1; i != 0; i--) {
+        j = randomInt(0, i);
+        item = items[j];
+        items[j] = items[i];
+        items[i] = item;
+    }
+}
+
+/** Variables globales */
+var paquetJoueur;
+var epidemdiesShuffle;
+var rolesShuffle = [];
+var paquetEpidemie;
+var paquetPropagationEntier = [];
+var pseudos = [];
+var lienSansPseudo = "";
 
 /** Retourne combien de cartes ville du paquet propatation il faut tirer */
 function combienTirerDeCartes(nbEpidemies) {
@@ -253,23 +275,3 @@ function prepatationPaquetPropagations() {
         i++;
     }
 }
-
-io.sockets.on('connection', function (socket) {
-    socket.on('add_new_player', function (pseudo) {
-        socket.pseudo = pseudo;
-        io.sockets.emit('new_player', socket.pseudo);
-    });
-    socket.on('get_players', function () {
-        var clients = io.sockets.clients();
-        var usernames = [];
-        for (var socket in clients.sockets) {
-            usernames.push(clients.sockets[socket].pseudo);
-        }
-        io.sockets.emit('players_list', usernames);
-    });
-    socket.on('get_game_parameters', function (url_parameters) {
-        var new_url_parameters = get_game_parameters(url_parameters);
-        io.sockets.emit('game_parameters', new_url_parameters);
-    });
-});
-server.listen(8080);
