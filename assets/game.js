@@ -53,64 +53,87 @@ function miseEnPlaceJoueur(idJoueur) {
 	document.getElementById(idJoueur + 'Image').innerHTML = '<img src=../images/' + encodeURI(role) +'.png width=100 height=130 class="zoomA">';
 }
 
-
+function run_local() {
+	var url_parameters = location.search.substring(1).length > 0 ? JSON.parse(
+		'{"'
+		+ decodeURI(
+		location.search.substring(1).replace(
+			/&/g,
+			"\",\"").replace(
+			/=/g,
+			"\":\"")) + '"}') : null;
+	run(url_parameters);
+}
 /** Fonction principale */
-function run () {
-	// S'il existe des paramètres dans la requête, on s'en sert
-	var vars = {};
-	vars['roleJoueur1'] = "";
-	vars['roleJoueur2'] = "";
-	vars['paquetJoueur'] = "";
-	vars['paquetPropagationEntier'] = "";
-	vars['pseudos'] = "";
-	vars['idUnique'] = ""
-	//var u = 0;
+function run (url_parameters) {
 	var idUnique = 0;
-
-	window.location.href.replace(location.hash, '').replace( 
-		/[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
-		function( m, key, value ) { // callback
-			vars[key] = value !== undefined ? value : '';
+	var is_role_in_parameters = false;
+	var is_paquet_joueur_in_parameters = false;
+	var is_paquet_propagation_in_parameters = false;
+	var is_pseudos_in_parameters = false;
+    // S'il existe des paramètres dans la requête, on s'en sert
+	for(let key in url_parameters) {
+		switch(key) {
+			case 'idUnique':
+				idUnique = url_parameters['idUnique'];
+				continue;
+			case 'roleJoueur1':
+				// Si les rôles sont passés en paramètre, on les prend
+				rolesShuffle[0] = decodeURI(url_parameters['roleJoueur1']);
+				is_role_in_parameters = true;
+				continue;
+			case 'roleJoueur2':
+				// Si les rôles sont passés en paramètre, on les prend
+				rolesShuffle[1] = decodeURI(url_parameters['roleJoueur2']);
+				is_role_in_parameters = true;
+				continue;
+			case 'paquetJoueur':
+				// Si le paquetJoueur est passé en paramètre, on le prend
+				paquetJoueur = decodeURI(url_parameters['paquetJoueur']).split('*');
+				is_paquet_joueur_in_parameters = true;
+				continue;
+			case 'paquetPropagationEntier':
+				// Si le paquet propagation est passé en paramètre, on le prend
+				paquetPropagationEntier = decodeURI(url_parameters['paquetPropagationEntier']).split('*');
+				is_paquet_propagation_in_parameters = true;
+				continue;
+			case 'pseudos':
+				// S'il y a des pseudos
+				var joueurs = [];
+				if(url_parameters['pseudos'].length === 0) {
+				    continue;
+                }
+				pseudos = decodeURI(url_parameters['pseudos']).split('*');
+				pseudos.forEach(function(item, index, array) {
+					// item est du type = potaw.1.0.10 (pseudo . nbTour . gagnePerdu . nbCartePropa)
+					var tab = item.split('.');
+					joueurs[index] = tab[0];
+				});
+				// On n'affiche pas dans l'ordre les joueurs qui ont joués, pour ne pas influencer
+				shuffle(joueurs);
+				alert("Nombre de personnes ayant joué ce scénario (" + idUnique + ") : " +pseudos.length + "\n - " + joueurs.join("\n - "));
+				is_pseudos_in_parameters = true;
+				continue;
 		}
-	);
-
-	if (vars['idUnique'].length >= 1) {
-		idUnique = vars['idUnique'];
 	}
-
-	// Si les rôles sont passés en paramètre, on les prend
-	if(vars['roleJoueur1'].length >= 1 && vars['roleJoueur2'].length >= 1) {
-		rolesShuffle[0] = decodeURI(vars['roleJoueur1']);
-		rolesShuffle[1] = decodeURI(vars['roleJoueur2']);
-	}
-	// Sinon, on mélange les rôles existants
-	else {
+	// Si les rôles ne sont pas passés en paramètre, on mélange les rôles existants
+	if(!is_role_in_parameters) {
 		rolesShuffle = roles.slice();
 		shuffle(rolesShuffle);
 	}
-
-	// Si le paquetJoueur est passé en paramètre, on le prend
-	if(vars['paquetJoueur'].length >= 1) {
-		paquetJoueur = decodeURI(vars['paquetJoueur']).split('*');
-	}
-	// Sinon, on le génère
-	else {
+	// Si le paquetJoueur n'est pas passé en paramètre, on le génère
+	if(!is_paquet_joueur_in_parameters) {
 		// Tableau temporaire d'évènements
 		var evenementsHasard = evenements;
-
 		// Mélange du tableau d'évènements
 		shuffle(evenementsHasard);
-
 		// Création du paquet joueur, avec que 5 évènements
 		paquetJoueur = bleu.concat(jaune).concat(noir).concat(rouge).concat(evenementsHasard.slice(3));
-
 		// Mélange du paquet joueur
 		shuffle(paquetJoueur);
-
 		// Mélange le paquet des 6 épidémies
 		epidemdiesShuffle = epidemies.slice();
 		shuffle(epidemdiesShuffle);
-
 		// Ajout des 6 épidémies en partant de la fin
 		paquetJoueur.splice(47 + randomInt(0,7), 0, epidemdiesShuffle.shift());
 		paquetJoueur.splice(39 + randomInt(0,7), 0, epidemdiesShuffle.shift());
@@ -119,55 +142,30 @@ function run () {
 		paquetJoueur.splice(16 + randomInt(0,8), 0, epidemdiesShuffle.shift());
 		paquetJoueur.splice(8 + randomInt(0,8), 0, epidemdiesShuffle.shift());
 	}
-
-	// Si le paquet propagation est passé en paramètre, on le prend
-	if(vars['paquetPropagationEntier'].length >= 1) {
-		paquetPropagationEntier = decodeURI(vars['paquetPropagationEntier']).split('*');
-	}
-	// Sinon, on le génère
-	else {
+	// Si le paquet propagation n'est pas passé en paramètre, on le génère
+	if(!is_paquet_propagation_in_parameters) {
 		// Préparation paquet épdémie
 		paquetEpidemie = bleu.concat(jaune).concat(noir).concat(rouge);
-
 		// Mélange du paquet épidémie
 		shuffle(paquetEpidemie);
-
 		// Préparation du paquet entier de Propagation
 		prepatationPaquetPropagations();
 	}
-
-	// On teste s'il y a des pseudos
-	if (vars['pseudos'].length >= 1) {
-		var joueurs = [];
-		pseudos = decodeURI(vars['pseudos']).split('*');
-		pseudos.forEach(function(item, index, array) {
-			// item est du type = potaw.1.0.10 (pseudo . nbTour . gagnePerdu . nbCartePropa)
-			var tab = item.split('.');
-			joueurs[index] = tab[0];
-		});
-
-		// On n'affiche pas dans l'ordre les joueurs qui ont joués, pour ne pas influencer
-		shuffle(joueurs);
-		alert("Nombre de personnes ayant joué ce scénario (" + idUnique + ") : " +pseudos.length + "\n - " + joueurs.join("\n - "));
-	}
-	else {
+	// S'il n'y a pas de pseudos
+	if(!is_pseudos_in_parameters) {
 		idUnique = Date.now();
 		alert("Vous êtes le 1er à jouer ce scénario (" + idUnique + ").\n\"Bon chance !\"");
 	}
-
-
 	// On génère le lien de la partie
-	lienSansPseudo = "scenariopandemic.html?" +
+	lienSansPseudo = "game.html?" +
 					(idUnique == 0 ? "" : "idUnique=" + idUnique) +
 					"&roleJoueur1=" +  encodeURI(rolesShuffle[0]) +
 					"&roleJoueur2=" +  encodeURI(rolesShuffle[1]) +
 					"&paquetJoueur=" + encodeURI(paquetJoueur.join('*')) +
 					"&paquetPropagationEntier=" + encodeURI(paquetPropagationEntier.join('*'));
-
 	// Permet de tirer les 4 cartes pour les 2 joueurs
 	miseEnPlaceJoueur('idJoueur1');
 	miseEnPlaceJoueur('idJoueur2');
-
 	// On écrit toutes les cartes au cas où
 	document.getElementById('idSpoilPaquetJoueur').innerHTML = paquetJoueur.join("<br />");
 	document.getElementById('idSpoilPaquetPropagation').innerHTML = paquetPropagationEntier.join("<br />");
