@@ -55,11 +55,9 @@
 		</div>
 		
 		
-		<div class="pasEnCours" id="idCarteJoueurs" style="display: block;">
+		<div class="pasEnCours" id="idCarteJoueurs" style="display: block;" height="300">
 			<strong><span id="idCarte1">... </span>
-			<span id="idCarte1Image"></span>
 			<span id="idCarte2"> </span></strong>
-			<span id="idCarte2Image"></span>
 		</div>
 		
 		<div class="enCours" id="idDivCartesPropagation">
@@ -83,8 +81,14 @@
 		</div>
 		
 		<div class="divStandard">
-			La partie vous a plû ? Vous voulez la partager ? <input type="button" onclick="genererLienParie()" value="Générer le lien" />
+			La partie vous a plu ? Vous voulez la partager ? <input type="button" onclick="genererLienPartie()" value="Générer le lien" />
 			<span id="idSpanLienPartie" style="display:none;"><br />Voici le <a id="idLienPartie" href=javascript:void(0);>lien de la partie</a>.</span>
+		</div>
+		
+		<br />
+		
+		<div class="divStandard">
+			Nouvelle partie ? <input type="button" onclick="nouvellePartie()" value="Nouvelle partie" /></span>
 		</div>
 		
 		<div class="divStandard">
@@ -110,7 +114,7 @@
 		</div>
 		
 		<footer>
-			v0.5.0<br />
+			v0.6.0<br />
 			Authors : Potaw (CDM 2019 avec Yo) et Fk (sparring de la CDM 2019)
 		</footer>
 		

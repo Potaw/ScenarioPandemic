@@ -180,7 +180,7 @@ function tirerCartes(idCarte) {
 	document.getElementById('idCarte1').style.display = "block";
 	document.getElementById('idCarte2').style.display = "block";
 
-	document.getElementById('idCarteJoueurs').className = 'enCours';
+	document.getElementById('idCarteJoueurs').className = 'enCours carteJoueur';
 	document.getElementById('idDivCartesPropagation').className = 'pasEnCours';
 
 	var isIdCarte1 = idCarte == 'idCarte1';
@@ -210,12 +210,6 @@ function tirerCartes(idCarte) {
 	// On prend la prochaine carte du paquet
 	var carte = paquetJoueur.shift();
 	document.getElementById(idCarte).innerHTML = "<font color='" + getCouleur(carte) + "'>" + carte + "</font>";
-	if (epidemies.indexOf(carte) >= 0) {
-		document.getElementById(idCarte + 'Image').innerHTML = '<center><img src=../images/' + encodeURI(carte) +'.png width=100 height=130 class="zoomA"></center>';
-	}
-	else {
-		document.getElementById(idCarte + 'Image').innerHTML = '';
-	}
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 }
 
@@ -355,7 +349,7 @@ function tournePropogation(){
 
 	document.getElementById('idCartesPropagation').style.display = "block";
 	document.getElementById('idCarteJoueurs').className = 'pasEnCours';
-	document.getElementById('idDivCartesPropagation').className = 'enCours';
+	document.getElementById('idDivCartesPropagation').className = 'enCours cartePropagation';
 
 	// On récupère 1ère carte du paquet propagation
 	var carte = paquetPropagationEntier.shift();
@@ -370,6 +364,8 @@ function tournePropogation(){
 	if (carte.charAt(0) == carte.charAt(2)) {
 		var joueur = (paquetJoueur.length + 1) % 4 == 0 ? 1 : 2;
 		document.getElementById('idTournePropagation').disabled = true;
+		document.getElementById('idOneClick').disabled = true;
+		document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte1').innerHTML;
 		document.getElementById('idGoJoueur').innerHTML = "Tour : " + document.getElementById('idJoueur' + joueur + 'Role').innerHTML;
 		document.getElementById('idGoJoueur').className = "goJoueur";
 	}
@@ -383,18 +379,18 @@ function reAfficher() {
 	document.getElementById('idCarte1').style.display = "block";
 	document.getElementById('idCarte2').style.display = "block";
 	document.getElementById('idCartesPropagation').style.display = "block";
+	document.getElementById('idDivCartesPropagation').className = 'enCours cartePropagation';
 }
 
 
 /** Lorqu'on est en survol du chrono */
 function nouveauTour() {
 	if (document.getElementById('idGoJoueur').className == "goJoueur") {
+		document.getElementById('idDivCartesPropagation').className = 'enCours';
 		document.getElementById('idButtonCarte1').disabled = false;
 		document.getElementById('idCarte1').style.display = "none";
 		document.getElementById('idCarte2').style.display = "none";
 		document.getElementById('idCartesPropagation').style.display = "none";
-		document.getElementById('idCarte1Image').innerHTML = '';
-		document.getElementById('idCarte2Image').innerHTML = '';
 		if (isChronoDejaTourne == false) {
 			nbTours++;
 			isChronoDejaTourne = true;
@@ -435,10 +431,17 @@ function partieTerminee(){
 
 
 /** Génère le lien de la partie */
-function genererLienParie() {
+function genererLienPartie() {
 	// On génère le lien à la demande si on souhaite rentrer plusieurs pseudos en cours de parties
 	document.getElementById('idLienPartie').href = lienSansPseudo + "&pseudos=" + pseudos.join('*');
 	document.getElementById('idSpanLienPartie').style.display = "block";
+}
+
+/** */
+function nouvellePartie() {
+	if(confirm("Voulez-vous démarrer une nouvelle partie ?")) {
+		window.location.replace("../views/index.html");
+	}
 }
 
 /** Permet de rendre visible quelques données de débugage */
@@ -447,11 +450,18 @@ function debug() {
 }
 
 
+/** Rend actif le bouton oneClick */
+function rendVisibleOneClick() {
+	document.getElementById('idOneClick').disabled = false;
+}
+
+
 /** Bouton unique pour gagner du temps :) */
 function oneClick() {
 	//alert(document.getElementById('idButtonCarte1').disabled);
 	if (document.getElementById('idButtonCarte2').style.display == "block") {
 		tirerCartes('idCarte2');
+		document.getElementById('idOneClick').innerHTML = document.getElementById('idTournePropagation').innerHTML;
 	}
 	else if (document.getElementById('idTournePropagation').disabled == false) {
 		tournePropogation();
@@ -461,6 +471,7 @@ function oneClick() {
 	}
 	else if (document.getElementById('idButtonCarte1').style.display == "block") {
 		tirerCartes('idCarte1');
+		document.getElementById('idOneClick').innerHTML = document.getElementById('idButtonCarte2').innerHTML;
 	}
 	else {
 		alert("rien");

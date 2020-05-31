@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="fr">
+	
 	<head>
 		<title>Scénarios Pandémie</title>
 		<meta charset="utf-8">
@@ -9,19 +10,27 @@
 		<script type="text/javascript" src = "../assets/prepare.js"></script>
 		<script></script>
 	</head>
+	
 	<body onload="run();">
 		<header>
 			Bienvenue à Scénario Pandemic, scénario aléatoire du type demi-finales du championnat du monde
 		</header>
-		<hr>
-		Choisir deux personnages:<p>
-		<center><form id="idBoxes" name="thisForm">
-		<br>
-		<input type="button" value="Start" onclick="get_roles(document.thisForm);">
-		</form>
+		
+		<br />
+		
+		Choisissez 0, 1 ou 2 personnages :
+		<p>
+			<center>
+				<form id="idBoxes" name="thisForm"><br/>
+					<input type="button" value="Start" onclick="get_roles(document.thisForm);">
+				</form>
+			</center>
+		</p>
+		
 		<footer>
-			v0.4.0<br />
+			v0.6.0<br />
 			Author : Potaw (CDM 2019 avec Yo)
 		</footer>
+		
 	</body>
 </html>

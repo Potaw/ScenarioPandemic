@@ -29,6 +29,22 @@ header {
 	font-size: 20pt;
 }
 
+.carteJoueur {
+	background: no-repeat;
+	background-position: top right;
+	height:300px;
+	background-size: 30%;
+	background-image:url("../images/fond_bleu3.png");
+}
+
+.cartePropagation {
+	background: no-repeat;
+	background-position: top right;
+	height:300px;
+	background-size: 30%;
+	background-image:url("../images/fond_vert3.png");
+}
+
 .chrono {
 	height:400px;
 	float:right;
