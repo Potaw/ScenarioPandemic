@@ -157,7 +157,7 @@ function run () {
 
 
 	// On génère le lien de la partie
-	lienSansPseudo = "scenariopandemic.html?" +
+	lienSansPseudo = "game.html?" +
 					(idUnique == 0 ? "" : "idUnique=" + idUnique) +
 					"&roleJoueur1=" +  encodeURI(rolesShuffle[0]) +
 					"&roleJoueur2=" +  encodeURI(rolesShuffle[1]) +
