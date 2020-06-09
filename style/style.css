@@ -1,3 +1,11 @@
+@import 'w3.css';
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
 body {
 	font-family:arial;
 	font-size: 10pt;
@@ -20,13 +28,13 @@ header {
 .enCours {
 	float:left;
 	width:40%;
-	font-size: 30pt;
+	font-size: 25pt;
 }
 
 .pasEnCours {
 	float:left;
 	width:30%;
-	font-size: 20pt;
+	font-size: 15pt;
 }
 
 .carteJoueur {
@@ -55,7 +63,7 @@ header {
 .joueur {
 	float:left;
 	width:50%;
-	font-size: 30pt;
+	font-size: 25pt;
 }
 
 .divStandard {

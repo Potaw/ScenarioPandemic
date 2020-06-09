@@ -22,7 +22,7 @@ function getCouleur(carte){
 		return 'blue';
 	}
 	else if (jaune.indexOf(carte) >= 0) {
-		return 'Orange';
+		return 'orange';
 	}
 	else if (noir.indexOf(carte) >= 0) {
 		return 'black';
@@ -31,9 +31,9 @@ function getCouleur(carte){
 		return 'red';
 	}
 	else if (epidemies.indexOf(carte) >= 0) {
-		return 'MediumSeaGreen';
+		return 'green';
 	}
-	return 'SlateGray';
+	return 'gray';
 }
 
 
@@ -45,9 +45,12 @@ function miseEnPlaceJoueur(idJoueur) {
 	var role=rolesShuffle.shift();
 	for(i = 0 ; i <= 3 ; i++) {
 		carte = paquetJoueur.shift();
-		cartes += "<li><font color='" + getCouleur(carte) + "'>" + carte + "</font></li>";
+		cartes +="<li class='w3-hover-" + getCouleur(carte) + "'>"
+		cartes += "<img src='../assets/" + getCouleur(carte) + ".png' class='w3-circle' style='width:40px'>  " + carte
+		cartes += "</li>"
 	}
 	cartes += "</ul>";
+
 	document.getElementById(idJoueur).innerHTML = cartes;
 	document.getElementById(idJoueur + 'Role').innerHTML = role;
 	document.getElementById(idJoueur + 'Image').innerHTML = '<img src=../images/' + encodeURI(role) +'.png width=100 height=130 class="zoomA">';
@@ -209,7 +212,11 @@ function tirerCartes(idCarte) {
 
 	// On prend la prochaine carte du paquet
 	var carte = paquetJoueur.shift();
-	document.getElementById(idCarte).innerHTML = "<font color='" + getCouleur(carte) + "'>" + carte + "</font>";
+	var cartes = "";
+	cartes += "<li style='list-style-type: none; width:400px' class='w3-hover-" + getCouleur(carte) + "'>"
+	cartes += "<img src='../assets/" + getCouleur(carte) + ".png' class='w3-circle' style='width:40px'>  " + carte
+	cartes += "</li>"
+	document.getElementById(idCarte).innerHTML = cartes;
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 }
 
@@ -356,8 +363,11 @@ function tournePropogation(){
 
 	// On coupe la carte au '-' pour récupérer la 2° partie (qui ne contient que la ville)
 	var ville = carte.split('-');
-
-	document.getElementById('idCartesPropagation').innerHTML += ville[0] + "<font color='" + getCouleur(ville[1].substr(1)) + "'>" + ville[1] + "</font><br />";
+	var cartes = "";
+	cartes += "<li style='list-style-type: none; width:400px' class='w3-hover-" + getCouleur(ville[1].substr(1)) + "'>"
+	cartes += "<img src='../assets/" + getCouleur(ville[1].substr(1)) + ".png' class='w3-circle' style='width:40px'>  " + carte
+	cartes += "</li>"
+	document.getElementById('idCartesPropagation').innerHTML += cartes;
 	document.getElementById('idRecap').innerHTML += carte + "<br />";
 
 	// Ici, on tire la X° carte sur X cartes à tirer du paquet propagation
