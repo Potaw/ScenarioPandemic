@@ -64,40 +64,12 @@
 			<strong><span id="idCartesPropagation"> </span></strong>
 		</div>
 		
-		
-		<div class="chrono" style="text-align:center; font-size:2em; font-weight:bold;">
-		  <span id="chrono">01:30</span>
+		<div class="chrono">
+			<p align="center">
+				<iframe title="Minuteur" height="300" src="https://www.chronometre-en-ligne.com/compte-a-rebours.html"
+				        onmouseover="nouveauTour();" onmouseout="rendVisibleOneClick()"></iframe>
+			</p>
 		</div>
-		
-		<script>
-		  // Durée du compte à rebours en secondes (ici 1 minutes 30 = 90s)
-		  let duree = 90;
-		
-		  // Cible où afficher le chrono
-		  const chronoElem = document.getElementById("chrono");
-		
-		  function majChrono() {
-		    let minutes = Math.floor(duree / 60);
-		    let secondes = duree % 60;
-		
-		    // Format avec zéro devant si besoin
-		    secondes = secondes < 10 ? "0" + secondes : secondes;
-		    minutes = minutes < 10 ? "0" + minutes : minutes;
-		
-		    chronoElem.textContent = minutes + ":" + secondes;
-		
-		    if (duree > 0) {
-		      duree--;
-		    } else {
-		      clearInterval(timer);
-		      chronoElem.textContent = "⏰ Terminé !";
-		    }
-		  }
-		
-		  // Mise à jour toutes les secondes
-		  majChrono(); // affichage initial
-		  let timer = setInterval(majChrono, 1000);
-		</script>
 		
 		<div class="divStandard">
 			Partie terminée ?<br/>
