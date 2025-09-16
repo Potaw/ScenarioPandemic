@@ -64,23 +64,21 @@
 			<strong><span id="idCartesPropagation"> </span></strong>
 		</div>
 		
-		<div>
+		<div class="chrono">
 			<p align="center">
-				<div>
-					<label><input type="radio" name="duration" value="120" checked> 2 minutes</label>
-					<label><input type="radio" name="duration" value="80"> 1 minute 20 secondes</label>
+				<div align="center">
+					<label><input type="radio" name="duration" value="120" checked>Tour 1</label>
+					<label><input type="radio" name="duration" value="80">Tours suivants</label>
 				</div>
-			
-				<div class="chrono" onmouseover="nouveauTour();" onmouseout="rendVisibleOneClick()">
-					<div id="timer">02:00</div>
-					<div>
+				<div onmouseover="nouveauTour();" onmouseout="rendVisibleOneClick()">
+					<div id="timer" class="minuteur" align="center">02:00</div>
+					<div align="center">
 						<button onclick="startTimer()">▶️ Démarrer</button>
 						<button onclick="pauseTimer()">⏸️ Pause</button>
 						<button onclick="resumeTimer()">⏯️ Reprendre</button>
 						<button onclick="resetTimer()">⏹️ Reset</button>
 					</div>
 				</div>
-			
 			</p>
 		</div>
 		
