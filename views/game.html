@@ -11,7 +11,7 @@
 	
 	<body onload="run();">
 		<header>
-			Bienvenue à Scénario Pandemic, scénario aléatoire du type demi-finales du championnat du monde
+			Bienvenue à Scénario Pandemic, scénario aléatoire du type finales du championnat du monde
 		</header>
 		
 		Cartes joueurs : <a id="idLienCartesJoueurs" onclick="cacherAfficherCartes('idCartesJoueurs', 'idLienCartesJoueurs')" href=javascript:void(0);>Cacher</a><br/>
@@ -47,7 +47,7 @@
 		</div>
 		
 		<div class="petitsBouttons">
-			<button onclick="oneClick()" align="right" id="idOneClick">oneClick</button>
+			<button onclick="oneClick()" align="right" id="idOneClick">Tirer carte propagation</button>
 		</div>
 		
 		<div class="clear">
@@ -85,13 +85,36 @@
 		<div class="divStandard">
 			Partie terminée ?<br/>
 			Saisissez votre pseudo (a-zA-Z0-9): <input id="idPseudo" type="text" size="6"></input>
-			<input type="radio" name="radioPartieTerminee" id="idGagne"><label for="idGagne">Gagnée</label></input>
-			<input type="radio" name="radioPartieTerminee" id="idPerdu"><label for="idPerdu">Perdue</label></input>
-			<input type="button" onclick="partieTerminee()" value="Partie terminée" />
+			<input type="radio" name="radioPartieTerminee" id="idGagne" onClick="remplirChampsFinPartie(1)"><label for="idGagne">Gagnée</label></input>
+			<input type="radio" name="radioPartieTerminee" id="idPerdu" onClick="remplirChampsFinPartie(0)"><label for="idPerdu">Perdue</label></input>
+			<div id="idNbRemedesEclosions" style="display: none;">
+				&nbsp;Nombres de remèdes trouvées : <select id="idNbRemedes">
+					<option value="0">0</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+				</select><br />
+				&nbsp;Nombres d'éclosions : <select id="idNbEclosions">
+					<option value="0">0</option>
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+				</select>
+				<br />
+				<input type="button" onclick="partieTerminee()" value="Partie terminée" />
+			</div>
+			
 		</div>
+		<br/>
 		
 		<div class="divStandard">
-			La partie vous a plu ? Vous voulez la partager ? <input type="button" onclick="genererLienPartie()" value="Générer le lien" />
+			La partie vous a plu ? Vous voulez la partager ? <input type="button" onclick="genererLienPartie()" value="Copier le lien" />
 			<span id="idSpanLienPartie" style="display:none;"><br />Voici le <a id="idLienPartie" href=javascript:void(0);>lien de la partie</a>.</span>
 		</div>
 		
@@ -124,7 +147,7 @@
 		</div>
 		
 		<footer>
-			v0.7.0<br />
+			v0.8.0<br />
 			Authors : Potaw (CDM 2019 avec Yo) et Fk (sparring de la CDM 2019)
 		</footer>
 		
