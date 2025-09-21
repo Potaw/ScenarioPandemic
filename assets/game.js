@@ -141,7 +141,7 @@ function run () {
 		var joueurs = [];
 		pseudos = decodeURI(vars['pseudos']).split('*');
 		pseudos.forEach(function(item, index, array) {
-			// item est du type = potaw.1.0.10 (pseudo . nbTour . gagnePerdu . nbCartePropa)
+			// item est du type = potaw.1.0.10.3.5 (pseudo . nbTour . gagnePerdu . nbCartePropa . nbRemedes . nbEclosions)
 			var tab = item.split('.');
 			joueurs[index] = tab[0];
 		});
@@ -308,7 +308,7 @@ function prepatationPaquetPropagations() {
 /** Informe par message si un joueur a déjà gagné ou perdue au tour en cours */
 function isPseudoGagnePerduCeTour(typeCarte) {
 	pseudos.forEach(function(item, index, array) {
-		// item est du type = potaw.1.0.10 (pseudo . nbTour . gagnePerdu . nbCartePropa)
+		// item est du type = potaw.1.0.10 (pseudo . nbTour . gagnePerdu . nbCartePropa . nbRemedes . nbEclosions)
 		var tab = item.split('.');
 
 		/* Cas général :
@@ -392,13 +392,24 @@ function nouveauTour() {
 		document.getElementById('idCarte2').style.display = "none";
 		document.getElementById('idCartesPropagation').style.display = "none";
 		if (isChronoDejaTourne == false) {
-			nbTours++;
 			isChronoDejaTourne = true;
+			nbTours++;
 			document.getElementById('idRecap').innerHTML += "<b>Tour " + nbTours + " : " + document.getElementById('idGoJoueur').innerHTML + "</b><br />";
 		}
 	}
 }
 
+/** Permet de saisir les champs de Nombres de remèdes et d'éclosions en fin de partie */
+function remplirChampsFinPartie(isGagne){
+	// On active les champs
+	document.getElementById('idNbRemedesEclosions').style.display = "block";
+	if(isGagne) {
+		document.getElementById('idNbRemedes').value = "4";
+	}
+	else {
+		document.getElementById('idNbRemedes').value = "0";
+	}
+}
 
 /** Partie terminée */
 function partieTerminee(){
@@ -426,7 +437,15 @@ function partieTerminee(){
 		alert("Vous devez cocher une case");
 		return;
 	}
-	pseudos[pseudos.length] = ps + "." + nbTours + "." + gagnePerdue + "." + nbCartesPropagationTournees;
+	pseudos[pseudos.length] = ps + "." + nbTours + "." + gagnePerdue + "." + nbCartesPropagationTournees + "." + document.getElementById('idNbRemedes').value + "." + document.getElementById('idNbEclosions').value;
+	
+	// On affiche le tableau récapitulatif si d'autres jouerus ont déjà joués cette partie
+	if (pseudos.length >=2) {
+		historiquePartie();
+		document.getElementById('idDebug').checked = true;
+		debug();
+	}
+	genererLienPartie();
 }
 
 
@@ -434,7 +453,13 @@ function partieTerminee(){
 function genererLienPartie() {
 	// On génère le lien à la demande si on souhaite rentrer plusieurs pseudos en cours de parties
 	document.getElementById('idLienPartie').href = lienSansPseudo + "&pseudos=" + pseudos.join('*');
-	document.getElementById('idSpanLienPartie').style.display = "block";
+	navigator.clipboard.writeText(lienSansPseudo + "&pseudos=" + pseudos.join('*'))
+      .then(() => {
+        alert("Lien copié !");
+      })
+      .catch(err => {
+        console.error("Erreur lors de la copie : ", err);
+      });
 }
 
 /** */
@@ -482,23 +507,27 @@ function oneClick() {
 /** Rempli le tableau de l'historique des joueurs de la partie */
 function historiquePartie () {
 	cacherAfficherCartes('idSpoilHistoJoueurs', 'idLienSpoilHistoJoueurs');
-	var monTableau = "<table border='1'> "+
+	var monTableau = "<center>Si une équipe perd <b>avant le 26° tour</b> : soit le nombre d'éclosions est à 8, soit il manquait des cubes.<table border='1'> "+
 						"<tr> "+
-						"	<td>Joueurs</td> "+
-						"	<td>Status</td> "+
-						"	<td>Nb tour (paquet joueur)</td> "+
-						"	<td>Nb cartes Propagation</td> "+
+						"	<th>Joueurs</th> "+
+						"	<th>Status</th> "+
+						"	<th>Nb tour (paquet joueur)</th> "+
+						"	<th>Nb cartes Propagation</th> "+
+						"	<th>Nb remèdes</th> "+
+						"	<th>Nb éclosions</th> "
 						"</tr>";
 
 	pseudos.forEach(function(item, index, array) {
-		// item est du type = potaw.1.0.10 (pseudo . nbTour . gagnePerdu . nbCartePropa)
+		// item est du type = potaw.1.0.10 (pseudo . nbTour . gagnePerdu . nbCartePropa . nbRemedes . nbEclosions)
 		var tab = item.split('.');
 		monTableau += "<tr> "+
 						"<td>" + tab[0] + "</td>"+
 						"<td>" + (tab[2] == 0 ? "Perdu" : "Gagné") + "</td>"+
 						"<td>" + tab[1] + "</td>"+
 						"<td>" + tab[3] + "</td>"+
+						"<td>" + tab[4] + "</td>"+
+						"<td>" + tab[5] + "</td>"+
 					"</tr>";
 	});
-	document.getElementById('idSpoilHistoJoueurs').innerHTML = monTableau + "</table>";
+	document.getElementById('idSpoilHistoJoueurs').innerHTML = monTableau + "</table></center>";
 }
